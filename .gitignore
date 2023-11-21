@@ -1,4 +1,6 @@
-
+# file configurazione
+Config.js 
+server/.env
 
 # dependencies
 node_modules/

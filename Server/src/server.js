@@ -2,23 +2,31 @@ const express = require('express')
 const app = express()
 require('dotenv').config()
 const bodyparser = require('body-parser')
-app.use(bodyparser.json())
+const cors = require('cors')
 
+app.use(bodyparser.json())
+app.use(cors())
+
+const all = require('./all-data')
 const select = require('./select-data')
 const insert = require('./insert')
 const delData = require('./delete-data')
 
 
-app.get('/people', async (req, res) => {
-  const result = await select()
+app.get('/anime', async (req, res) => {
+  const result = await all()
   res.json(result)
 })
 
-app.get('/people/:id', async (req, res) => {
+app.get('/anime/:id', async (req, res) => {
   const id = req.params.id
   const result = await select(id)
   res.json(result)
 })
+
+//ok
+
+
 
 app.post('/people', async (req, res) => {
   const input = req.body
