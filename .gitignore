@@ -1,6 +1,7 @@
 # file configurazione
 Config.js 
 server/.env
+package.json
 
 # dependencies
 node_modules/
