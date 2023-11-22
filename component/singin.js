@@ -2,7 +2,7 @@ import { API } from '../Config';
 import { View, Text, Button, TextInput, StyleSheet, Alert } from 'react-native';
 import { useEffect, useState } from 'react';
 
-function Registration({ navigation }) {
+function Singin({ navigation }) {
     const [inputUsername, setInputUsername] = useState('')
     const [inputEmail, setInputEmail] = useState('')
     const [inputPass, setInputPass] = useState('')
@@ -21,7 +21,7 @@ function Registration({ navigation }) {
 
     const handleRegistration = () => {
 
-        fetch(`${API}/register`, {
+        fetch(`${API}/singin`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -108,4 +108,4 @@ const styles = StyleSheet.create({
     },
 })
 
-export default Registration
+export default Singin

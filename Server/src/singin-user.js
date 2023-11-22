@@ -2,7 +2,7 @@
 const { compareSync } = require('bcryptjs');
 const connection = require('./connection')
 
-async function register({ email, username, password }) {
+async function singin({ email, username, password }) {
     let db = await connection()
     let col = db.collection("Users");
 
@@ -15,7 +15,12 @@ async function register({ email, username, password }) {
             error = "email già in uso."
         }
         if (checkUsername) {
-            error = "username già in uso."
+            if (!error) {
+                error = "username già in uso."
+            } else {
+                mess = "username e "
+                error = mess + error
+            }
         }
         throw error
     }
@@ -31,4 +36,4 @@ async function register({ email, username, password }) {
     return result
 }
 
-module.exports = register
+module.exports = singin

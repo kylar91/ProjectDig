@@ -5,7 +5,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import Home from './component/home.js';
 import AnimeDetails from './component/dettagliAnime.js';
 import Login from './component/login.js';
-import Registration from './component/registration.js';
+import Singin from './component/singin.js';
 import styles from './css.js'
 
 const Stack = createStackNavigator();
@@ -60,8 +60,8 @@ export default function App() {
           }}
         />
         <Stack.Screen
-          name="Registration"
-          component={Registration}
+          name="Sing-in"
+          component={Singin}
           options={{
             title: 'Registrati',
           }}

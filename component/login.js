@@ -50,7 +50,7 @@ function Login({ navigation }) {
             />
             <Button
                 onPress={() => {
-                    navigation.navigate('Registration')
+                    navigation.navigate('Sing-in')
                 }}
                 title='Registrati'
                 color="#008000" // Verde

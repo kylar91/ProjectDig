@@ -12,7 +12,7 @@ app.use(cors())
 //ok
 const all = require('./all-data')
 const select = require('./select-data')
-const register = require('./register-user')
+const singin = require('./singin-user')
 const login = require('./login-user')
 
 //no
@@ -31,11 +31,11 @@ app.get('/anime/:id', async (req, res) => {
   res.json(result)
 })
 
-app.post('/register', async (req, res) => {
+app.post('/singin', async (req, res) => {
   try {
     const { email, username, password } = req.body
     const hashedPassword = await bcrypt.hash(password, 10)
-    const user = await register({ email, username, password: hashedPassword })
+    const user = await singin({ email, username, password: hashedPassword })
     res.status(201).json({ message: 'Registrazione avvenuta con successo.' })
   } catch (error) {
     if (error) {
