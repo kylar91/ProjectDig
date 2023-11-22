@@ -30,7 +30,7 @@ export default function App() {
       <Stack.Navigator
         screenOptions={{
           headerStyle: {
-            backgroundColor: '#4CAF50', // Colore di sfondo dell'header
+            backgroundColor: '#008000', // Colore di sfondo dell'header
           },
           headerTintColor: 'white', // Colore del testo dell'header
           headerTitleStyle: {

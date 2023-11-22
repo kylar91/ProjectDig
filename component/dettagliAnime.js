@@ -31,6 +31,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         padding: 16,
+        backgroundColor: '#000', // Colore di sfondo nero
     },
     image: {
         width: 200,
@@ -42,10 +43,12 @@ const styles = StyleSheet.create({
         fontSize: 24,
         fontWeight: 'bold',
         marginBottom: 8,
+        color: '#fff', // Testo bianco
     },
     infoText: {
         fontSize: 16,
         marginBottom: 8,
+        color: '#fff', // Testo bianco
     },
 });
 

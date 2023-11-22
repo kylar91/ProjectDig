@@ -29,6 +29,7 @@ function Login({ navigation }) {
             <TextInput
                 style={styles.input}
                 placeholder="Email"
+                placeholderTextColor="#fff"
                 onChangeText={handleInputChangeEmail}
                 value={inputEmail}
             />
@@ -36,6 +37,7 @@ function Login({ navigation }) {
             <TextInput
                 style={styles.input}
                 placeholder="Password"
+                placeholderTextColor="#fff"
                 secureTextEntry={true}
                 onChangeText={handleInputChangePass}
                 value={inputPass}
@@ -43,7 +45,7 @@ function Login({ navigation }) {
 
             <Button
                 title="Accedi"
-                color="black"
+                color="#008000" // Verde
                 onPress={handleLogin}
             />
             <Button
@@ -51,7 +53,7 @@ function Login({ navigation }) {
                     navigation.navigate('Registration')
                 }}
                 title='Registrati'
-                color="black"
+                color="#008000" // Verde
             />
         </View>
     );
@@ -62,11 +64,13 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+        backgroundColor: '#000', // Nero
     },
     title: {
         fontSize: 20,
         fontWeight: 'bold',
         marginBottom: 20,
+        color: '#fff', // Testo bianco
     },
     input: {
         height: 40,
@@ -75,6 +79,7 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         paddingLeft: 10,
         width: 250,
+        color: '#fff', // Testo bianco
     },
 });
 

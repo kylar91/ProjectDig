@@ -50,6 +50,7 @@ function Home() {
             <TextInput
                 style={styles.searchInput}
                 placeholder="Cerca per nome..."
+                placeholderTextColor="#fff"
                 onChangeText={handleSearch}
                 value={searchQuery}
             />
@@ -69,27 +70,29 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#f0f0f0',
+        backgroundColor: '#000', // Colore di sfondo nero
     },
     headerText: {
         fontSize: 24,
         fontWeight: 'bold',
         marginBottom: 20,
+        color: '#fff', // Testo bianco
     },
     searchInput: {
         height: 40,
-        borderColor: 'gray',
+        borderColor: '#fff', // Bordo bianco
         borderWidth: 1,
         marginBottom: 10,
         paddingLeft: 10,
         width: 250,
+        color: '#fff', // Testo bianco
     },
     listContainer: {
         paddingHorizontal: 16,
     },
     itemContainer: {
         marginBottom: 16,
-        backgroundColor: '#fff',
+        backgroundColor: '#008000', // Colore verde
         borderRadius: 8,
         padding: 16,
         shadowColor: '#000',
@@ -107,6 +110,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 18,
         fontWeight: 'bold',
+        color: '#fff', // Testo bianco
     },
 });
 
