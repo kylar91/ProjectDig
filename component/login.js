@@ -1,26 +1,57 @@
+import { API } from '../Config';
 import { useEffect, useState } from 'react';
-import { View, Text, Button, TextInput, StyleSheet } from 'react-native';
+import { View, Text, Button, TextInput, StyleSheet, Alert } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-function Login({ navigation }) {
-    const [inputEmail, setInputEmail] = useState('');
-    const [inputPass, setInputPass] = useState('');
+function Login({ navigation, route }) {
+    const [inputUsername, setInputUsername] = useState('')
+    const [inputPass, setInputPass] = useState('')
+    const { setForceUpdate } = route.params
+
+    const increaseForceUpdate = () => {
+        setForceUpdate(prevValue => prevValue + 1);
+    }
 
     const handleInputChangeEmail = (text) => {
-        setInputEmail(text);
-    };
+        setInputUsername(text)
+    }
 
     const handleInputChangePass = (text) => {
-        setInputPass(text);
-    };
+        setInputPass(text)
+    }
 
     const handleLogin = () => {
-        // Esempio di azione di accesso con i dati inseriti
-        console.log('Email:', inputEmail);
-        console.log('Password:', inputPass);
 
-        // Qui puoi aggiungere la logica di accesso reale, ad esempio, inviando i dati al tuo server
-        // e gestendo la risposta del server.
-    };
+        fetch(`${API}/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                username: inputUsername,
+                password: inputPass
+            })
+        })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(error => {
+                        throw error
+                    })
+                }
+                return response.json()
+            })
+            .then(data => {
+                const token = data.token
+                return AsyncStorage.setItem('token', token)
+            })
+            .then(() => {
+                increaseForceUpdate()
+                navigation.navigate('Home')
+            })
+            .catch(error => {
+                Alert.alert('Errore', error.error)
+            })
+    }
 
     return (
         <View style={styles.container}>
@@ -31,7 +62,7 @@ function Login({ navigation }) {
                 placeholder="Email"
                 placeholderTextColor="#fff"
                 onChangeText={handleInputChangeEmail}
-                value={inputEmail}
+                value={inputUsername}
             />
 
             <TextInput
@@ -56,7 +87,7 @@ function Login({ navigation }) {
                 color="#008000" // Verde
             />
         </View>
-    );
+    )
 }
 
 const styles = StyleSheet.create({
@@ -83,4 +114,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default Login;
+export default Login

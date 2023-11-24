@@ -5,6 +5,8 @@ const bodyparser = require('body-parser')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const cors = require('cors')
+const secretKey = process.env.SECRET_KEY
+const port = process.env.SERVER_PORT
 
 app.use(bodyparser.json())
 app.use(cors())
@@ -14,6 +16,8 @@ const all = require('./all-data')
 const select = require('./select-data')
 const singin = require('./singin-user')
 const login = require('./login-user')
+const tokens = require('./tokens')
+const logout = require('./logout-user')
 
 //no
 // const insert = require('./insert')
@@ -46,8 +50,6 @@ app.post('/singin', async (req, res) => {
   }
 })
 
-//ok
-
 app.post('/login', async (req, res) => {
   try {
     const { username, password } = req.body
@@ -63,12 +65,37 @@ app.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Credenziali non valide.' })
     }
 
-    const token = jwt.sign({ userId: user._id }, 'secretkey')
+    const token = jwt.sign({ userId: user._id }, secretKey)
+    const insertToken = tokens({ token })
     res.json({ token })
   } catch (error) {
     res.status(500).json({ error: 'Errore durante il login.' })
   }
 })
+
+app.delete('/logout', async (req, res) => {
+  try {
+    const { token } = req.body;
+
+    const result = await logout({ token });
+
+    if (result.deletedCount > 0) {
+      res.json({ success: true, message: 'Logout effettuato con successo.' });
+    } else {
+      res.status(404).json({ success: false, error: 'Token non trovato.' });
+    }
+  } catch (error) {
+    console.error('Errore durante il logout:', error);
+    res.status(500).json({ success: false, error: 'Errore durante il logout.' });
+  }
+})
+
+app.get('/token', async (req, res) => {
+  const result = await all()
+  res.json(result)
+})
+
+//ok
 
 
 //no
@@ -90,6 +117,6 @@ app.post('/login', async (req, res) => {
 //   }
 // })
 
-app.listen(process.env.SERVER_PORT, () => {
-  console.log(`Server running on port ${process.env.SERVER_PORT}`)
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`)
 })

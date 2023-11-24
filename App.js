@@ -1,7 +1,10 @@
+import { API } from './Config';
 import { StatusBar } from 'expo-status-bar';
-import { Button } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Button, Alert } from 'react-native';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Home from './component/home.js';
 import AnimeDetails from './component/dettagliAnime.js';
 import Login from './component/login.js';
@@ -23,8 +26,80 @@ const LoginButton = () => {
   )
 }
 
+const LogoutButton = (props) => {
+  return (
+    <Button
+      onPress={() => {
+        logout(props.update)
+      }}
+      title='Disconnettiti'
+      color="black"
+    />
+  )
+}
+
+const LogButton = (props) => {
+  if (props.flag) {
+    return <LogoutButton update={props.update} />;
+  } else {
+    return <LoginButton />;
+  }
+}
+
+const logout = async (setForceUpdate) => {
+  const token = await AsyncStorage.getItem('token')
+
+  fetch(`${API}/logout`, {
+    method: 'Delete',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ token })
+  })
+    .then(response => {
+      if (!response.ok) {
+        return response.json().then(error => {
+          throw error
+        })
+      }
+      return response.json()
+    })
+    .then(data => data)
+    .then(() => {
+      AsyncStorage.removeItem('token')
+        .then(() => {
+          decreaseForceUpdate(setForceUpdate)
+          Alert.alert('Logout effettuato');
+        })
+        .catch(error => {
+          console.error('Errore durante la cancellazione del token:', error);
+        });
+    })
+    .catch(error => {
+      Alert.alert('Errore', error.error)
+    })
+}
+
+const decreaseForceUpdate = (setForceUpdate) => {
+  setForceUpdate(prevValue => prevValue - 1);
+}
 
 export default function App() {
+  const [checkLog, setCheckLog] = useState(false)
+  const [forceUpdate, setForceUpdate] = useState(0)
+
+  useEffect(() => {
+    const getToken = async () => {
+      const token = await AsyncStorage.getItem('token')
+      if (token) {
+        setCheckLog(true)
+      } else {
+        setCheckLog(false)
+      }
+    }
+    getToken()
+  }, [forceUpdate])
+
   return (
     <NavigationContainer>
       <Stack.Navigator
@@ -42,7 +117,7 @@ export default function App() {
           component={Home}
           options={{
             title: 'La mia Home',
-            headerRight: () => <LoginButton />,
+            headerRight: () => <LogButton flag={checkLog} update={setForceUpdate} />,
           }}
         />
         <Stack.Screen
@@ -55,6 +130,7 @@ export default function App() {
         <Stack.Screen
           name="Login"
           component={Login}
+          initialParams={{ setForceUpdate }}
           options={{
             title: 'Accedi',
           }}

@@ -1,5 +1,4 @@
 //ok
-const { compareSync } = require('bcryptjs');
 const connection = require('./connection')
 
 async function singin({ email, username, password }) {
