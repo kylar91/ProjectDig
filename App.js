@@ -1,17 +1,17 @@
-import { API } from './Config';
-import { StatusBar } from 'expo-status-bar';
-import React, { useEffect, useState } from 'react';
-import { Button, Alert } from 'react-native';
-import { NavigationContainer, useNavigation } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import Home from './component/home.js';
-import AnimeDetails from './component/dettagliAnime.js';
-import Login from './component/login.js';
-import Singin from './component/singin.js';
+import { API } from './Config'
+import { StatusBar } from 'expo-status-bar'
+import React, { useEffect, useState } from 'react'
+import { Button, Alert } from 'react-native'
+import { NavigationContainer, useNavigation } from '@react-navigation/native'
+import { createStackNavigator } from '@react-navigation/stack'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import Home from './component/home.js'
+import AnimeDetails from './component/dettagliAnime.js'
+import Login from './component/login.js'
+import Singin from './component/singin.js'
 import styles from './css.js'
 
-const Stack = createStackNavigator();
+const Stack = createStackNavigator()
 
 const LoginButton = () => {
   const navigation = useNavigation()
@@ -40,9 +40,9 @@ const LogoutButton = (props) => {
 
 const LogButton = (props) => {
   if (props.flag) {
-    return <LogoutButton update={props.update} />;
+    return <LogoutButton update={props.update} />
   } else {
-    return <LoginButton />;
+    return <LoginButton />
   }
 }
 
@@ -64,16 +64,17 @@ const logout = async (setForceUpdate) => {
       }
       return response.json()
     })
+    //da rimuovere data?
     .then(data => data)
     .then(() => {
       AsyncStorage.removeItem('token')
         .then(() => {
           decreaseForceUpdate(setForceUpdate)
-          Alert.alert('Logout effettuato');
+          Alert.alert('Logout effettuato')
         })
         .catch(error => {
-          console.error('Errore durante la cancellazione del token:', error);
-        });
+          console.error('Errore durante la cancellazione del token:', error)
+        })
     })
     .catch(error => {
       Alert.alert('Errore', error.error)
@@ -81,7 +82,7 @@ const logout = async (setForceUpdate) => {
 }
 
 const decreaseForceUpdate = (setForceUpdate) => {
-  setForceUpdate(prevValue => prevValue - 1);
+  setForceUpdate(prevValue => prevValue - 1)
 }
 
 export default function App() {
@@ -144,5 +145,5 @@ export default function App() {
         />
       </Stack.Navigator>
     </NavigationContainer>
-  );
+  )
 }

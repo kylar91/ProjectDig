@@ -1,7 +1,7 @@
-import { API } from '../Config';
-import { useEffect, useState } from 'react';
-import { View, Text, Button, TextInput, StyleSheet, Alert } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API } from '../Config'
+import { useEffect, useState } from 'react'
+import { View, Text, Button, TextInput, StyleSheet, Alert } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 function Login({ navigation, route }) {
     const [inputUsername, setInputUsername] = useState('')
@@ -9,7 +9,7 @@ function Login({ navigation, route }) {
     const { setForceUpdate } = route.params
 
     const increaseForceUpdate = () => {
-        setForceUpdate(prevValue => prevValue + 1);
+        setForceUpdate(prevValue => prevValue + 1)
     }
 
     const handleInputChangeEmail = (text) => {
@@ -112,6 +112,6 @@ const styles = StyleSheet.create({
         width: 250,
         color: '#fff', // Testo bianco
     },
-});
+})
 
 export default Login

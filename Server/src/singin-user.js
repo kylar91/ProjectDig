@@ -3,7 +3,7 @@ const connection = require('./connection')
 
 async function singin({ email, username, password }) {
     let db = await connection()
-    let col = db.collection("Users");
+    let col = db.collection("Users")
 
     const checkEmail = await col.findOne({ email })
     const checkUsername = await col.findOne({ username })
@@ -30,7 +30,7 @@ async function singin({ email, username, password }) {
         password
     }
 
-    const result = await col.insertOne(user);
+    const result = await col.insertOne(user)
 
     return result
 }

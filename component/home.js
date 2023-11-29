@@ -1,37 +1,37 @@
-import { API } from '../Config';
-import React, { useEffect, useState } from 'react';
-import { View, Text, Image, TouchableOpacity, TextInput, StyleSheet, FlatList } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { API } from '../Config'
+import React, { useEffect, useState } from 'react'
+import { View, Text, Image, TouchableOpacity, TextInput, StyleSheet, FlatList } from 'react-native'
+import { useNavigation } from '@react-navigation/native'
 
 function Home() {
-    const [listAnime, setListAnime] = useState([]);
-    const [searchQuery, setSearchQuery] = useState('');
-    const [filteredAnime, setFilteredAnime] = useState([]);
-    const navigation = useNavigation();
+    const [listAnime, setListAnime] = useState([])
+    const [searchQuery, setSearchQuery] = useState('')
+    const [filteredAnime, setFilteredAnime] = useState([])
+    const navigation = useNavigation()
 
     useEffect(() => {
         fetch(`${API}/anime`)
             .then(response => response.json())
             .then(data => {
-                setListAnime(data);
-                setFilteredAnime(data); // Inizialmente, mostra tutti gli anime
+                setListAnime(data)
+                setFilteredAnime(data)
             })
-            .catch(error => console.error('Errore nella richiesta di rete:', error));
-    }, []);
+            .catch(error => console.error('Errore nella richiesta di rete:', error))
+    }, [])
 
     const handleAnimePress = (animeId) => {
         if (animeId) {
-            navigation.navigate('Dettagli Anime', { animeId });
+            navigation.navigate('Dettagli Anime', { animeId })
         }
-    };
+    }
 
     const handleSearch = (query) => {
-        setSearchQuery(query);
+        setSearchQuery(query)
         const filtered = listAnime.filter(anime =>
             anime.anime.toLowerCase().includes(query.toLowerCase())
-        );
-        setFilteredAnime(filtered);
-    };
+        )
+        setFilteredAnime(filtered)
+    }
 
     const renderItem = ({ item }) => (
         <TouchableOpacity onPress={() => handleAnimePress(item._id)}>
@@ -40,7 +40,7 @@ function Home() {
                 <Text style={styles.title}>{item.anime}</Text>
             </View>
         </TouchableOpacity>
-    );
+    )
 
     return (
         <View style={styles.container}>
@@ -62,7 +62,7 @@ function Home() {
                 contentContainerStyle={styles.listContainer}
             />
         </View>
-    );
+    )
 }
 
 const styles = StyleSheet.create({
@@ -112,6 +112,6 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#fff', // Testo bianco
     },
-});
+})
 
-export default Home;
+export default Home

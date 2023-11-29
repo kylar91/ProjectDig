@@ -1,6 +1,6 @@
-import { API } from '../Config';
-import { View, Text, Button, TextInput, StyleSheet, Alert } from 'react-native';
-import { useEffect, useState } from 'react';
+import { API } from '../Config'
+import { View, Text, Button, TextInput, StyleSheet, Alert } from 'react-native'
+import { useEffect, useState } from 'react'
 
 function Singin({ navigation }) {
     const [inputUsername, setInputUsername] = useState('')

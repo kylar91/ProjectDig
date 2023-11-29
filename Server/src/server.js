@@ -18,6 +18,7 @@ const singin = require('./singin-user')
 const login = require('./login-user')
 const tokens = require('./tokens')
 const logout = require('./logout-user')
+const addOnList = require('./add-on-list')
 
 //no
 // const insert = require('./insert')
@@ -75,18 +76,18 @@ app.post('/login', async (req, res) => {
 
 app.delete('/logout', async (req, res) => {
   try {
-    const { token } = req.body;
+    const { token } = req.body
 
-    const result = await logout({ token });
+    const result = await logout({ token })
 
     if (result.deletedCount > 0) {
-      res.json({ success: true, message: 'Logout effettuato con successo.' });
+      res.json({ success: true, message: 'Logout effettuato con successo.' })
     } else {
-      res.status(404).json({ success: false, error: 'Token non trovato.' });
+      res.status(404).json({ success: false, error: 'Token non trovato.' })
     }
   } catch (error) {
-    console.error('Errore durante il logout:', error);
-    res.status(500).json({ success: false, error: 'Errore durante il logout.' });
+    console.error('Errore durante il logout:', error)
+    res.status(500).json({ success: false, error: 'Errore durante il logout.' })
   }
 })
 
@@ -96,6 +97,21 @@ app.get('/token', async (req, res) => {
 })
 
 //ok
+
+app.post('/mylists', async (req, res) => {
+  try {
+    const { animeId, token, nameList } = req.body
+    const decodedToken = jwt.verify(token, secretKey)
+    const userId = decodedToken.userId
+
+    const result = await addOnList(animeId, userId, nameList)
+
+    res.status(201)
+  } catch (error) {
+    res.status(500).json({ error: `Errore durante l'aggiunta alla lista` })
+  }
+})
+
 
 
 //no

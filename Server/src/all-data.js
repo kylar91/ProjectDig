@@ -3,7 +3,7 @@ const connection = require('./connection')
 
 async function all() {
     let db = await connection()
-    let col = db.collection("Anime");
+    let col = db.collection("Anime")
 
     // Find and return the document
     let result = await col.find().toArray()
