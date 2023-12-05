@@ -19,21 +19,27 @@ const login = require('./login-user')
 const tokens = require('./tokens')
 const logout = require('./logout-user')
 const addOnList = require('./add-on-list')
-
-//no
-// const insert = require('./insert')
-// const delData = require('./delete-data')
-
+const addComment = require('./add-comment')
 
 app.get('/anime', async (req, res) => {
-  const result = await all()
-  res.json(result)
+  try {
+    const result = await all()
+    res.json(result)
+
+  } catch (error) {
+    res.status(500).json({ error: `Errore nel server` })
+  }
 })
 
 app.get('/anime/:id', async (req, res) => {
-  const id = req.params.id
-  const result = await select(id)
-  res.json(result)
+  try {
+    const id = req.params.id
+    const result = await select('Anime', id)
+    res.json(result)
+
+  } catch (error) {
+    res.status(500).json({ error: `Errore nel server` })
+  }
 })
 
 app.post('/singin', async (req, res) => {
@@ -96,8 +102,6 @@ app.get('/token', async (req, res) => {
   res.json(result)
 })
 
-//ok
-
 app.post('/mylists', async (req, res) => {
   try {
     const { animeId, token, nameList } = req.body
@@ -112,26 +116,33 @@ app.post('/mylists', async (req, res) => {
   }
 })
 
+//ok
 
+app.get('/comments/:id', async (req, res) => {
+  try {
+    const id = req.params.id
+    const result = await select('Comments', id)
+    res.json(result)
 
-//no
-// app.post('/people', async (req, res) => {
-//   const input = req.body
-//   await insert(input)
-// })
+  } catch (error) {
+    res.status(500).json({ error: `Errore nel server` })
+  }
+})
 
-// // todo creare validazione per id - middelware
-// app.post('/people/:id/appointments', async (req, res) => {
-//   const appointment = req.body
-//   const id = req.params.id
-//   const result = await select(id)
-//   if (result) {
-//     res.json(await insert(appointment, "appointments")
-//     )
-//   } else {
-//     res.status(404).json({ error: true, msg: "id non trovato" })
-//   }
-// })
+app.post('/comments/:id/comment', async (req, res) => {
+  try {
+    const id = req.params.id
+    const { token, comment } = req.body
+    const decodedToken = jwt.verify(token, secretKey)
+    const userId = decodedToken.userId
+
+    const result = await addComment(id, userId, comment)
+
+    res.status(201).json({ success: true })
+  } catch {
+    res.status(500).json({ error: `Errore durante l'aggiunta del commento` })
+  }
+})
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`)

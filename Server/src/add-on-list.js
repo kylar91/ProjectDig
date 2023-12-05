@@ -1,9 +1,10 @@
+//ok
 const { ObjectId } = require("mongodb")
 const connection = require('./connection')
 const select = require('./select-data')
 
 async function addOnList(animeId, userId, nameList) {
-    const anime = await select(animeId)
+    const anime = await select('Anime', animeId)
 
     let db = await connection()
     let col = db.collection("List")
@@ -28,6 +29,7 @@ async function addOnList(animeId, userId, nameList) {
             updateField[`${nameList}`] = anime
             const updateResult = await col.updateOne({ _id: new ObjectId(userId) }, { $push: updateField })
         }
+        return
 
     } else {
         let newList = {
@@ -41,7 +43,7 @@ async function addOnList(animeId, userId, nameList) {
 
         const result = await col.insertOne(newList)
 
-        return result
+        return
     }
 }
 

@@ -1,30 +1,28 @@
-import { API } from '../Config'
-import React, { useEffect, useState } from 'react'
-import { View, Text, Image, StyleSheet, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native'
-import CommentSection from './commentSection'
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import { API } from '../Config';
+import React, { useEffect, useState } from 'react';
+import { View, Text, Image, StyleSheet, FlatList, TextInput, TouchableOpacity, Alert } from 'react-native';
+import CommentSection from './commentSection';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function AnimeDetails({ route }) {
-    const [animeInfo, setAnimeInfo] = useState([])
-    const [comment, setComment] = useState('')
-    const { animeId } = route.params
-    const nameList = ["in_corso", "completati", "droppati"]
+    const [animeInfo, setAnimeInfo] = useState([]);
+    const { animeId } = route.params;
+    const nameList = ["in_corso", "completati", "droppati"];
 
     useEffect(() => {
         fetch(`${API}/anime/${animeId}`)
             .then(response => response.json())
             .then(data => setAnimeInfo(data))
-            .catch(error => console.error('Errore nella richiesta di rete:', error))
-    }, [animeId])
-
+            .catch(error => console.error('Errore nella richiesta di rete:', error));
+    }, [animeId]);
 
     const addOnList = async (nameListIndex) => {
-        const token = await AsyncStorage.getItem('token')
+        const token = await AsyncStorage.getItem('token');
         if (token) {
             fetch(`${API}/mylists`, {
                 method: 'POST',
                 headers: {
-                    'Content-TYpe': 'application/json',
+                    'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
                     animeId: animeId,
@@ -35,67 +33,60 @@ function AnimeDetails({ route }) {
                 .then(response => {
                     if (!response.ok) {
                         return response.json().then(error => {
-                            throw error
-                        })
+                            throw error;
+                        });
                     }
-                    return response.json()
+                    return response.json();
                 })
                 .catch(error => {
-                    Alert.alert('Error', error.error)
-                })
+                    Alert.alert('Error', error.error);
+                });
         } else {
             //todo
         }
-
-    }
+    };
 
     return (
         <View style={styles.container}>
-            <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContainer}>
-                <View style={styles.contentContainer}>
-                    <Image source={{ uri: animeInfo.img }} style={styles.image} />
-                    <Text style={styles.title}>{animeInfo.anime}</Text>
-                    <Text style={styles.infoText}>Data: {animeInfo.data}</Text>
-                    <Text style={styles.infoText}>Episodi: {animeInfo.episodi}</Text>
-                    <Text style={styles.infoText}>Stato: {animeInfo.stato}</Text>
-                    <Text style={styles.infoText}>{animeInfo.info}</Text>
-                    {/* Sezione Commenti */}
-                    <CommentSection />
-                </View>
-            </ScrollView>
+            <FlatList
+                data={[animeInfo]}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({ item }) => (
+                    <View style={styles.contentContainer}>
+                        <Image source={{ uri: item.img }} style={styles.image} />
+                        <Text style={styles.title}>{item.anime}</Text>
+                        <Text style={styles.infoText}>Data: {item.data}</Text>
+                        <Text style={styles.infoText}>Episodi: {item.episodi}</Text>
+                        <Text style={styles.infoText}>Stato: {item.stato}</Text>
+                        <Text style={styles.infoText}>{item.info}</Text>
+                        {/* Sezione Commenti */}
+                        <CommentSection animeId={animeId} />
+                    </View>
+                )}
+                nestedScrollEnabled={true}
+                style={{ marginBottom: 64, width: '100%' }} // Aggiunto margine inferiore
+            />
 
             {/* Footer Fisso */}
             <View style={styles.footer}>
-                <TouchableOpacity style={styles.footerButton}
-                    onPress={() => addOnList(nameList[0])}>
+                <TouchableOpacity style={styles.footerButton} onPress={() => addOnList(nameList[0])}>
                     <Text style={styles.footerButtonText}>In corso</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.footerButton}
-                    onPress={() => addOnList(nameList[1])}>
+                <TouchableOpacity style={styles.footerButton} onPress={() => addOnList(nameList[1])}>
                     <Text style={styles.footerButtonText}>Completato</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.footerButton}
-                    onPress={() => addOnList(nameList[2])}>
+                <TouchableOpacity style={styles.footerButton} onPress={() => addOnList(nameList[2])}>
                     <Text style={styles.footerButtonText}>Droppato</Text>
                 </TouchableOpacity>
             </View>
         </View>
-    )
+    );
 }
 
 const styles = StyleSheet.create({
     container: {
-        flexGrow: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 16,
-        backgroundColor: '#000', // Colore di sfondo nero
-    },
-    scrollView: {
         flex: 1,
-    },
-    scrollContainer: {
-        paddingBottom: 64, // Altezza del footer
+        backgroundColor: '#000',
     },
     contentContainer: {
         justifyContent: 'center',
@@ -112,12 +103,12 @@ const styles = StyleSheet.create({
         fontSize: 24,
         fontWeight: 'bold',
         marginBottom: 8,
-        color: '#fff', // Testo bianco
+        color: '#fff',
     },
     infoText: {
         fontSize: 16,
         marginBottom: 8,
-        color: '#fff', // Testo bianco
+        color: '#fff',
     },
     footer: {
         flexDirection: 'row',
@@ -125,21 +116,21 @@ const styles = StyleSheet.create({
         width: '100%',
         position: 'absolute',
         bottom: 0,
-        backgroundColor: '#008000', // Colore verde
+        backgroundColor: '#008000',
         padding: 16,
     },
     footerButton: {
         flex: 1,
-        backgroundColor: '#000', // Colore di sfondo nero
+        backgroundColor: '#000',
         padding: 8,
         borderRadius: 8,
         marginRight: 8,
         alignItems: 'center',
     },
     footerButtonText: {
-        color: '#fff', // Testo bianco
+        color: '#fff',
         fontWeight: 'bold',
     },
-})
+});
 
-export default AnimeDetails
+export default AnimeDetails;
