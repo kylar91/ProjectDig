@@ -2,6 +2,7 @@ import { API } from '../Config'
 import React, { useEffect, useState } from 'react'
 import { View, Text, Image, TouchableOpacity, TextInput, StyleSheet, FlatList } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function Home() {
     const [listAnime, setListAnime] = useState([])
@@ -33,6 +34,19 @@ function Home() {
         setFilteredAnime(filtered)
     }
 
+    const myList = async () => {
+        const token = await AsyncStorage.getItem('token');
+        if (token) {
+            navigation.navigate('My list')
+        } else {
+            //todo
+        }
+    }
+
+    const settings = () => {
+        //todo
+    }
+
     const renderItem = ({ item }) => (
         <TouchableOpacity onPress={() => handleAnimePress(item._id)}>
             <View style={styles.itemContainer}>
@@ -44,7 +58,7 @@ function Home() {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.headerText}>Lista degli Anime</Text>
+            <Text style={styles.headerText}>Anime</Text>
 
             {/* Barra di Ricerca */}
             <TextInput
@@ -61,6 +75,16 @@ function Home() {
                 renderItem={renderItem}
                 contentContainerStyle={styles.listContainer}
             />
+
+            {/* Footer Fisso */}
+            <View style={styles.footer}>
+                <TouchableOpacity style={styles.footerButton} onPress={() => myList()}>
+                    <Text style={styles.footerButtonText}>Le mie liste</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.footerButton} onPress={() => settings()}>
+                    <Text style={styles.footerButtonText}>impostazioni</Text>
+                </TouchableOpacity>
+            </View>
         </View>
     )
 }
@@ -111,6 +135,29 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
         color: '#fff', // Testo bianco
+    },
+    footer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
+        position: 'absolute',
+        bottom: 0,
+        backgroundColor: '#008000',
+        padding: 16,
+        borderTopWidth: 3,
+        borderTopColor: '#000',
+    },
+    footerButton: {
+        flex: 1,
+        backgroundColor: '#000',
+        padding: 8,
+        borderRadius: 8,
+        marginRight: 8,
+        alignItems: 'center',
+    },
+    footerButtonText: {
+        color: '#fff',
+        fontWeight: 'bold',
     },
 })
 

@@ -1,5 +1,4 @@
 import { API } from './Config'
-import { StatusBar } from 'expo-status-bar'
 import React, { useEffect, useState } from 'react'
 import { Button, Alert } from 'react-native'
 import { NavigationContainer, useNavigation } from '@react-navigation/native'
@@ -9,6 +8,7 @@ import Home from './component/home.js'
 import AnimeDetails from './component/dettagliAnime.js'
 import Login from './component/login.js'
 import Singin from './component/singin.js'
+import MyList from './component/mylist.js'
 import styles from './css.js'
 
 const Stack = createStackNavigator()
@@ -64,8 +64,6 @@ const logout = async (setForceUpdate) => {
       }
       return response.json()
     })
-    //da rimuovere data?
-    .then(data => data)
     .then(() => {
       AsyncStorage.removeItem('token')
         .then(() => {
@@ -118,7 +116,9 @@ export default function App() {
           component={Home}
           options={{
             title: 'La mia Home',
-            headerRight: () => <LogButton flag={checkLog} update={setForceUpdate} />,
+            headerRight: () => <LogButton flag={checkLog} update={setForceUpdate}
+            />,
+            headerRightContainerStyle: { marginRight: 15 },
           }}
         />
         <Stack.Screen
@@ -141,6 +141,13 @@ export default function App() {
           component={Singin}
           options={{
             title: 'Registrati',
+          }}
+        />
+        <Stack.Screen
+          name="My list"
+          component={MyList}
+          options={{
+            title: 'Le mie liste',
           }}
         />
       </Stack.Navigator>

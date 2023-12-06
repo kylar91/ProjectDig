@@ -79,6 +79,7 @@ function Login({ navigation, route }) {
                 color="#008000" // Verde
                 onPress={handleLogin}
             />
+            <Text style={styles.text}>Non hai un account?</Text>
             <Button
                 onPress={() => {
                     navigation.navigate('Sing-in')
@@ -101,6 +102,11 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: 'bold',
         marginBottom: 20,
+        color: '#fff', // Testo bianco
+    },
+    text: {
+        fontSize: 17,
+        margin: 10,
         color: '#fff', // Testo bianco
     },
     input: {

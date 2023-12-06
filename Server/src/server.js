@@ -102,7 +102,7 @@ app.get('/token', async (req, res) => {
   res.json(result)
 })
 
-app.post('/mylists', async (req, res) => {
+app.post('/addMyLists', async (req, res) => {
   try {
     const { animeId, token, nameList } = req.body
     const decodedToken = jwt.verify(token, secretKey)
@@ -110,13 +110,11 @@ app.post('/mylists', async (req, res) => {
 
     const result = await addOnList(animeId, userId, nameList)
 
-    res.status(201)
+    res.status(201).json({ success: true })
   } catch (error) {
     res.status(500).json({ error: `Errore durante l'aggiunta alla lista` })
   }
 })
-
-//ok
 
 app.get('/comments/:id', async (req, res) => {
   try {
@@ -141,6 +139,20 @@ app.post('/comments/:id/comment', async (req, res) => {
     res.status(201).json({ success: true })
   } catch {
     res.status(500).json({ error: `Errore durante l'aggiunta del commento` })
+  }
+})
+
+//ok
+
+app.get('/myLists', async (req, res) => {
+  try {
+    const token = req.headers.authorization.split(' ')[1]
+    const decodedToken = jwt.verify(token, secretKey)
+    const userId = decodedToken.userId
+    const result = await select('List', userId)
+    res.json(result)
+  } catch (error) {
+    res.status(500).json({ error: `Errore nel server` })
   }
 })
 

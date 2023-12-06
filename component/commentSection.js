@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { View, TextInput, TouchableOpacity, Text, StyleSheet, FlatList, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const CommentSection = ({ animeId }) => {
+function CommentSection({ animeId }) {
     const [newComment, setNewComment] = useState('');
     const [comments, setComments] = useState([]);
     const [forceRerender, setForceRerender] = useState(false);

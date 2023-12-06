@@ -8,6 +8,7 @@ function AnimeDetails({ route }) {
     const [animeInfo, setAnimeInfo] = useState([]);
     const { animeId } = route.params;
     const nameList = ["in_corso", "completati", "droppati"];
+    const [addedToListMessage, setAddedToListMessage] = useState(null);
 
     useEffect(() => {
         fetch(`${API}/anime/${animeId}`)
@@ -19,7 +20,7 @@ function AnimeDetails({ route }) {
     const addOnList = async (nameListIndex) => {
         const token = await AsyncStorage.getItem('token');
         if (token) {
-            fetch(`${API}/mylists`, {
+            fetch(`${API}/addMyLists`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -38,6 +39,13 @@ function AnimeDetails({ route }) {
                     }
                     return response.json();
                 })
+                .then(() => {
+                    // da sistemare la scritta in corso
+                    setAddedToListMessage(`Anime aggiunto a "${nameListIndex}" con successo!`);
+                    setTimeout(() => {
+                        setAddedToListMessage(null);
+                    }, 3000);
+                })
                 .catch(error => {
                     Alert.alert('Error', error.error);
                 });
@@ -48,6 +56,11 @@ function AnimeDetails({ route }) {
 
     return (
         <View style={styles.container}>
+            {addedToListMessage && (
+                <View style={styles.successMessage}>
+                    <Text style={styles.successMessageText}>{addedToListMessage.replace('_', ' ')}</Text>
+                </View>
+            )}
             <FlatList
                 data={[animeInfo]}
                 keyExtractor={(item, index) => index.toString()}
@@ -59,6 +72,7 @@ function AnimeDetails({ route }) {
                         <Text style={styles.infoText}>Episodi: {item.episodi}</Text>
                         <Text style={styles.infoText}>Stato: {item.stato}</Text>
                         <Text style={styles.infoText}>{item.info}</Text>
+
                         {/* Sezione Commenti */}
                         <CommentSection animeId={animeId} />
                     </View>
@@ -118,6 +132,8 @@ const styles = StyleSheet.create({
         bottom: 0,
         backgroundColor: '#008000',
         padding: 16,
+        borderTopWidth: 3,
+        borderTopColor: '#000',
     },
     footerButton: {
         flex: 1,
@@ -129,6 +145,22 @@ const styles = StyleSheet.create({
     },
     footerButtonText: {
         color: '#fff',
+        fontWeight: 'bold',
+    },
+    successMessage: {
+        position: 'absolute',
+        backgroundColor: 'green',
+        padding: 10,
+        borderRadius: 5,
+        marginTop: 10,
+        alignItems: 'center',
+        borderWidth: 5,
+        borderColor: 'black',
+        alignSelf: 'center',
+        zIndex: 1,
+    },
+    successMessageText: {
+        color: 'white',
         fontWeight: 'bold',
     },
 });
