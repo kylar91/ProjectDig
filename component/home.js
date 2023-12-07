@@ -58,23 +58,26 @@ function Home() {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.headerText}>Anime</Text>
+            <View style={styles.containerFlat}>
+                <Text style={styles.headerText}>Anime</Text>
 
-            {/* Barra di Ricerca */}
-            <TextInput
-                style={styles.searchInput}
-                placeholder="Cerca per nome..."
-                placeholderTextColor="#fff"
-                onChangeText={handleSearch}
-                value={searchQuery}
-            />
+                {/* Barra di Ricerca */}
+                <TextInput
+                    style={styles.searchInput}
+                    placeholder="Cerca per nome..."
+                    placeholderTextColor="#fff"
+                    onChangeText={handleSearch}
+                    value={searchQuery}
+                />
 
-            <FlatList
-                data={filteredAnime}
-                keyExtractor={(item) => item._id.toString()}
-                renderItem={renderItem}
-                contentContainerStyle={styles.listContainer}
-            />
+                <FlatList
+                    data={filteredAnime}
+                    keyExtractor={(item) => item._id.toString()}
+                    renderItem={renderItem}
+                    contentContainerStyle={styles.listContainer}
+                />
+            </View>
+
 
             {/* Footer Fisso */}
             <View style={styles.footer}>
@@ -92,9 +95,13 @@ function Home() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: '#000', // Colore di sfondo nero
+    },
+    containerFlat: {
+        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#000', // Colore di sfondo nero
+        marginBottom: 60,
     },
     headerText: {
         fontSize: 24,

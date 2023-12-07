@@ -2,13 +2,15 @@ import { API } from '../Config'
 import React, { useEffect, useState } from 'react'
 import { View, Text, Image, TouchableOpacity, TextInput, StyleSheet, FlatList } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native'
 
 function MyList() {
     const [myListAnime, setMyListAnime] = useState([])
     const [searchQuery, setSearchQuery] = useState('')
     const [filteredMyListAnime, setFilteredMyListAnime] = useState([])
-    const nameList = ["in_corso", "completati", "droppati"]
     const [list, setList] = useState('')
+    const nameList = ["in_corso", "completati", "droppati"]
+    const navigation = useNavigation()
 
     useEffect(() => {
         const getMyLists = async () => {
@@ -35,6 +37,12 @@ function MyList() {
         setList(nameListIndex)
     }
 
+    const handleAnimePress = (animeId) => {
+        if (animeId) {
+            navigation.navigate('Dettagli Anime', { animeId })
+        }
+    }
+
     const renderItem = ({ item }) => (
         <TouchableOpacity onPress={() => handleAnimePress(item._id)}>
             <View style={styles.itemContainer}>
@@ -58,30 +66,33 @@ function MyList() {
 
     return (
         <View style={styles.container}>
-            {list ? (
-                <View>
-                    <Text style={styles.title}>La tua lista {list.replace('_', ' ')}</Text>
-                </View>
-            ) : (
-                <View>
-                    <Text style={styles.title}>Seleziona una lista</Text>
-                </View>
-            )}
-            {/* Barra di Ricerca */}
-            <TextInput
-                style={styles.searchInput}
-                placeholder="Cerca per nome..."
-                placeholderTextColor="#fff"
-                onChangeText={handleSearch}
-                value={searchQuery}
-            />
+            <View style={styles.containerFlat}>
+                {list ? (
+                    <View>
+                        <Text style={styles.title}>La tua lista {list.replace('_', ' ')}</Text>
+                    </View>
+                ) : (
+                    <View>
+                        <Text style={styles.title}>Seleziona una lista</Text>
+                    </View>
+                )}
+                {/* Barra di Ricerca */}
+                <TextInput
+                    style={styles.searchInput}
+                    placeholder="Cerca per nome..."
+                    placeholderTextColor="#fff"
+                    onChangeText={handleSearch}
+                    value={searchQuery}
+                />
 
-            <FlatList
-                data={filteredMyListAnime[list]}
-                keyExtractor={(item) => item._id.toString()}
-                renderItem={renderItem}
-                contentContainerStyle={styles.listContainer}
-            />
+                <FlatList
+                    data={filteredMyListAnime[list]}
+                    keyExtractor={(item) => item._id.toString()}
+                    renderItem={renderItem}
+                    contentContainerStyle={styles.listContainer}
+                />
+            </View>
+
 
             {/* Footer Fisso */}
             <View style={styles.footer}>
@@ -102,9 +113,13 @@ function MyList() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: '#000', // Colore di sfondo nero
+    },
+    containerFlat: {
+        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#000', // Colore di sfondo nero
+        marginBottom: 60,
     },
     headerText: {
         fontSize: 24,
