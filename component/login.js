@@ -59,7 +59,7 @@ function Login({ navigation, route }) {
 
             <TextInput
                 style={styles.input}
-                placeholder="Email"
+                placeholder="Username"
                 placeholderTextColor="#fff"
                 onChangeText={handleInputChangeEmail}
                 value={inputUsername}

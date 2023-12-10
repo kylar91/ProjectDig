@@ -1,6 +1,6 @@
 import { API } from '../Config'
 import React, { useEffect, useState } from 'react'
-import { View, Text, Image, TouchableOpacity, TextInput, StyleSheet, FlatList } from 'react-native'
+import { View, Text, Image, TouchableOpacity, TextInput, StyleSheet, FlatList, Alert } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native'
 
@@ -12,24 +12,25 @@ function MyList() {
     const nameList = ["in_corso", "completati", "droppati"]
     const navigation = useNavigation()
 
-    useEffect(() => {
-        const getMyLists = async () => {
-            const token = await AsyncStorage.getItem('token');
+    const getMyLists = async () => {
+        const token = await AsyncStorage.getItem('token');
 
-            fetch(`${API}/myLists`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
+        fetch(`${API}/myLists`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                setMyListAnime(data)
+                setFilteredMyListAnime(data)
             })
-                .then(response => response.json())
-                .then(data => {
-                    setMyListAnime(data)
-                    setFilteredMyListAnime(data)
-                })
-                .catch(error => console.error('Errore nella richiesta di rete:', error))
-        }
+            .catch(error => console.error('Errore nella richiesta di rete:', error))
+    }
+
+    useEffect(() => {
         getMyLists()
     }, [])
 
@@ -43,14 +44,50 @@ function MyList() {
         }
     }
 
+    const handleDeleteAnime = async (animeId) => {
+        const token = await AsyncStorage.getItem('token');
+        fetch(`${API}/delMyLists`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                animeId: animeId,
+                token: token,
+                nameList: list
+            })
+        })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(error => {
+                        throw error;
+                    });
+                }
+                return response.json();
+            })
+            .then(() => {
+                getMyLists()
+            })
+            .catch(error => {
+                Alert.alert('Error', error.error);
+            });
+    }
+
     const renderItem = ({ item }) => (
         <TouchableOpacity onPress={() => handleAnimePress(item._id)}>
             <View style={styles.itemContainer}>
                 <Image source={{ uri: item.img }} style={styles.image} />
                 <Text style={styles.title}>{item.anime}</Text>
+                {/* Aggiungi il bottone di eliminazione */}
+                <TouchableOpacity
+                    style={styles.deleteButton}
+                    onPress={() => handleDeleteAnime(item._id)}
+                >
+                    <Text style={styles.deleteButtonText}>Elimina</Text>
+                </TouchableOpacity>
             </View>
         </TouchableOpacity>
-    )
+    );
 
     const handleSearch = (query) => {
         setSearchQuery(query)
@@ -69,21 +106,23 @@ function MyList() {
             <View style={styles.containerFlat}>
                 {list ? (
                     <View>
-                        <Text style={styles.title}>La tua lista {list.replace('_', ' ')}</Text>
+                        <Text style={styles.headerText}>La tua lista {list.replace('_', ' ')}</Text>
+                        {/* Barra di Ricerca */}
+                        <TextInput
+                            style={styles.searchInput}
+                            placeholder="Cerca per nome..."
+                            placeholderTextColor="#fff"
+                            onChangeText={handleSearch}
+                            value={searchQuery}
+                        />
                     </View>
+
                 ) : (
                     <View>
-                        <Text style={styles.title}>Seleziona una lista</Text>
+                        <Text style={styles.firstTitle}>Seleziona una lista</Text>
                     </View>
                 )}
-                {/* Barra di Ricerca */}
-                <TextInput
-                    style={styles.searchInput}
-                    placeholder="Cerca per nome..."
-                    placeholderTextColor="#fff"
-                    onChangeText={handleSearch}
-                    value={searchQuery}
-                />
+
 
                 <FlatList
                     data={filteredMyListAnime[list]}
@@ -156,10 +195,15 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         marginBottom: 8,
     },
-    title: {
-        fontSize: 18,
+    firstTitle: {
+        flex: 1,
+        fontSize: 24,
         fontWeight: 'bold',
+        marginBottom: 20,
         color: '#fff', // Testo bianco
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: '80%',
     },
     footer: {
         flexDirection: 'row',
@@ -217,6 +261,18 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
         color: '#fff', // Testo bianco
+    },
+
+    deleteButton: {
+        backgroundColor: 'red',
+        padding: 8,
+        borderRadius: 8,
+        marginTop: 8,
+        alignItems: 'center',
+    },
+    deleteButtonText: {
+        color: '#fff',
+        fontWeight: 'bold',
     },
 })
 

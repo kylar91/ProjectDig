@@ -37,7 +37,6 @@ function CommentSection({ animeId }) {
             })
                 .then(response => {
                     if (!response.ok) {
-                        console.log('!no')
                         return response.json().then(error => {
                             throw error;
                         });

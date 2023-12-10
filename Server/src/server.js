@@ -20,6 +20,7 @@ const tokens = require('./tokens')
 const logout = require('./logout-user')
 const addOnList = require('./add-on-list')
 const addComment = require('./add-comment')
+const delOnList = require('./del-on-list')
 
 app.get('/anime', async (req, res) => {
   try {
@@ -92,7 +93,6 @@ app.delete('/logout', async (req, res) => {
       res.status(404).json({ success: false, error: 'Token non trovato.' })
     }
   } catch (error) {
-    console.error('Errore durante il logout:', error)
     res.status(500).json({ success: false, error: 'Errore durante il logout.' })
   }
 })
@@ -102,6 +102,7 @@ app.get('/token', async (req, res) => {
   res.json(result)
 })
 
+//post or put? add?
 app.post('/addMyLists', async (req, res) => {
   try {
     const { animeId, token, nameList } = req.body
@@ -142,8 +143,6 @@ app.post('/comments/:id/comment', async (req, res) => {
   }
 })
 
-//ok
-
 app.get('/myLists', async (req, res) => {
   try {
     const token = req.headers.authorization.split(' ')[1]
@@ -155,6 +154,29 @@ app.get('/myLists', async (req, res) => {
     res.status(500).json({ error: `Errore nel server` })
   }
 })
+
+app.delete('/delMyLists', async (req, res) => {
+  try {
+    const { animeId, token, nameList } = req.body
+    const decodedToken = jwt.verify(token, secretKey)
+    const userId = decodedToken.userId
+
+    const result = await delOnList(animeId, userId, nameList)
+
+    if (result.modifiedCount > 0) {
+      res.json({ success: true, message: 'Anime rimosso con successo.' })
+    } else {
+      res.status(404).json({ success: false, error: 'anime non trovato.' })
+    }
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: `Errore durante la rimozione dell'anime.`
+    })
+  }
+})
+
+//ok
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`)
