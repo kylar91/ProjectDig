@@ -10,6 +10,7 @@ function AnimeDetails({ route }) {
     const nameList = ["in_corso", "completati", "droppati"];
     const [addedToListMessage, setAddedToListMessage] = useState(null);
 
+
     useEffect(() => {
         fetch(`${API}/anime/${animeId}`)
             .then(response => response.json())
