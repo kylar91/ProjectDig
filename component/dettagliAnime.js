@@ -6,7 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function AnimeDetails({ route }) {
     const [animeInfo, setAnimeInfo] = useState([]);
-    const { animeId } = route.params;
+    const { animeId, setRerenderMyList } = route.params;
     const nameList = ["in_corso", "completati", "droppati"];
     const [addedToListMessage, setAddedToListMessage] = useState(null);
 
@@ -40,8 +40,11 @@ function AnimeDetails({ route }) {
                     return response.json();
                 })
                 .then(() => {
+                    if (setRerenderMyList) {
+                        setRerenderMyList(value => !value)
+                    }
                     // da sistemare la scritta in corso
-                    setAddedToListMessage(`Anime aggiunto a "${nameListIndex}" con successo!`);
+                    setAddedToListMessage(`Anime aggiunto a "${nameListIndex.replace('_', ' ')}" con successo!`);
                     setTimeout(() => {
                         setAddedToListMessage(null);
                     }, 3000);

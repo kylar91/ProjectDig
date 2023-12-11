@@ -8,6 +8,7 @@ function MyList() {
     const [myListAnime, setMyListAnime] = useState([])
     const [searchQuery, setSearchQuery] = useState('')
     const [filteredMyListAnime, setFilteredMyListAnime] = useState([])
+    const [rerenderMyList, setRerenderMyList] = useState(false)
     const [list, setList] = useState('')
     const nameList = ["in_corso", "completati", "droppati"]
     const navigation = useNavigation()
@@ -32,7 +33,7 @@ function MyList() {
 
     useEffect(() => {
         getMyLists()
-    }, [])
+    }, [rerenderMyList])
 
     const myList = (nameListIndex) => {
         setList(nameListIndex)
@@ -40,7 +41,7 @@ function MyList() {
 
     const handleAnimePress = (animeId) => {
         if (animeId) {
-            navigation.navigate('Dettagli Anime', { animeId })
+            navigation.navigate('Dettagli Anime', { animeId, setRerenderMyList })
         }
     }
 
