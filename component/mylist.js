@@ -51,7 +51,7 @@ function MyList() {
         const storageJSON = await AsyncStorage.getItem('storage')
         const storageData = JSON.parse(storageJSON)
         const token = storageData.token
-        fetch(`${API}/delMyLists`, {
+        fetch(`${API}/myLists/del`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
     },
 
     deleteButton: {
-        backgroundColor: 'red',
+        backgroundColor: '#d10000',
         padding: 8,
         borderRadius: 8,
         marginTop: 8,

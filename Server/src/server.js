@@ -11,7 +11,6 @@ const port = process.env.SERVER_PORT
 app.use(bodyparser.json())
 app.use(cors())
 
-//ok
 const all = require('./all-data')
 const select = require('./select-data')
 const singin = require('./singin-user')
@@ -21,6 +20,8 @@ const logout = require('./logout-user')
 const addOnList = require('./add-on-list')
 const addComment = require('./add-comment')
 const delOnList = require('./del-on-list')
+const delComment = require('./del-comment')
+const putComment = require('./put-comment')
 
 app.get('/anime', async (req, res) => {
   try {
@@ -104,7 +105,7 @@ app.get('/token', async (req, res) => {
 })
 
 //post or put? add?
-app.post('/addMyLists', async (req, res) => {
+app.post('/myLists/add', async (req, res) => {
   try {
     const { animeId, token, nameList } = req.body
     const decodedToken = jwt.verify(token, secretKey)
@@ -132,11 +133,9 @@ app.get('/comments/:id', async (req, res) => {
 app.post('/comments/:id/comment', async (req, res) => {
   try {
     const id = req.params.id
-    const { token, comment } = req.body
-    const decodedToken = jwt.verify(token, secretKey)
-    const userId = decodedToken.userId
+    const { user, comment } = req.body
 
-    const result = await addComment(id, userId, comment)
+    const result = await addComment(id, user, comment)
 
     res.status(201).json({ success: true })
   } catch {
@@ -156,7 +155,7 @@ app.get('/myLists', async (req, res) => {
   }
 })
 
-app.delete('/delMyLists', async (req, res) => {
+app.delete('/myLists/del', async (req, res) => {
   try {
     const { animeId, token, nameList } = req.body
     const decodedToken = jwt.verify(token, secretKey)
@@ -177,7 +176,45 @@ app.delete('/delMyLists', async (req, res) => {
   }
 })
 
+app.delete('/comments/:id/comment/del', async (req, res) => {
+  try {
+    const { animeId, commentId } = req.body
+
+    const result = await delComment(animeId, commentId)
+
+    if (result.modifiedCount > 0) {
+      res.json({ success: true, message: 'Commento rimosso con successo.' })
+    } else {
+      res.status(404).json({ success: false, error: 'Commento non trovato.' })
+    }
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: `Errore durante la rimozione del commento.`
+    })
+  }
+})
+
 //ok
+
+app.put('/comments/:id/comment/put', async (req, res) => {
+  try {
+    const { animeId, commentId, newText } = req.body
+
+    const result = await putComment(animeId, commentId, newText)
+
+    if (result.modifiedCount > 0) {
+      res.json({ success: true, message: 'Commento modificato con successo.' })
+    } else {
+      res.status(404).json({ success: false, error: 'Commento non trovato.' })
+    }
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: `Errore durante la modifica del commento.`
+    })
+  }
+})
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`)

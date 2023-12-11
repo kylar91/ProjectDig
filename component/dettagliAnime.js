@@ -22,7 +22,7 @@ function AnimeDetails({ route }) {
         if (storageJSON) {
             const storageData = JSON.parse(storageJSON)
             const token = storageData.token
-            fetch(`${API}/addMyLists`, {
+            fetch(`${API}/myLists/add`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

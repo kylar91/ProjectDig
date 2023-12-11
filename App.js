@@ -117,7 +117,7 @@ export default function App() {
           name="Home"
           component={Home}
           options={{
-            title: 'La mia Home',
+            title: 'Home',
             headerRight: () => <LogButton flag={checkLog} update={setForceUpdate}
             />,
             headerRightContainerStyle: { marginRight: 15 },

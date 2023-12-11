@@ -7,12 +7,20 @@ function CommentSection({ animeId }) {
     const [newComment, setNewComment] = useState('');
     const [comments, setComments] = useState([]);
     const [forceRerender, setForceRerender] = useState(false);
+    const [user, setUser] = useState('')
+    const [token, setToken] = useState('')
 
     useEffect(() => {
         fetchComments();
     }, [animeId, forceRerender]);
 
-    const fetchComments = () => {
+    const fetchComments = async () => {
+        const storageJSON = await AsyncStorage.getItem('storage')
+        if (storageJSON) {
+            const storageData = JSON.parse(storageJSON)
+            setUser(storageData.user)
+            setToken(storageData.token)
+        }
         fetch(`${API}/comments/${animeId}`)
             .then(response => response.json())
             .then(data => {
@@ -23,18 +31,14 @@ function CommentSection({ animeId }) {
 
     const handleCommentSubmit = async () => {
         // Invia il commento al server
-        const storageJSON = await AsyncStorage.getItem('storage')
-        if (storageJSON) {
-            const storageData = JSON.parse(storageJSON)
-            const token = storageData.token
-            const user = storageData.user
+        if (token) {
             fetch(`${API}/comments/${animeId}/comment`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    token: token,
+                    user: user,
                     comment: newComment
                 })
             })
@@ -66,8 +70,49 @@ function CommentSection({ animeId }) {
                 <Text style={styles.commentDate}>{item.data}</Text>
             </View>
             <Text style={styles.commentText}>{item.comment}</Text>
+            {user && item.username === user && (
+                <View style={styles.buttonContainer}>
+                    <TouchableOpacity onPress={() => handleDeleteComment(item._id)}>
+                        <Text style={styles.deleteButton}>Elimina</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => handleEditComment(item._id)}>
+                        <Text style={styles.editButton}>Modifica</Text>
+                    </TouchableOpacity>
+                </View>
+            )}
         </View>
-    );
+    )
+
+    const handleDeleteComment = (commentId) => {
+        fetch(`${API}/comments/:id/comment/del`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                animeId: animeId,
+                commentId: commentId,
+            })
+        })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(error => {
+                        throw error;
+                    });
+                }
+                return response.json();
+            })
+            .then(() => {
+                setForceRerender(!forceRerender)
+            })
+            .catch(error => {
+                Alert.alert('Error', error.error);
+            });
+    }
+
+    const handleEditComment = (commentId) => {
+        //todo
+    }
 
     return (
         <View style={styles.container}>
@@ -152,6 +197,26 @@ const styles = StyleSheet.create({
     },
     commentText: {
         color: '#fff',
+    },
+    buttonContainer: {
+        flexDirection: 'row', // Imposta la direzione della fila
+        justifyContent: 'space-between', // Distribuisce lo spazio tra i bottoni
+        marginTop: 8, // Aggiunge uno spazio superiore tra il testo del commento e i bottoni
+    },
+    deleteButton: {
+        backgroundColor: '#d10000',
+        padding: 10,
+        borderRadius: 5,
+        marginRight: 8, // Aggiunge uno spazio tra i bottoni
+        color: '#fff',
+        fontWeight: 'bold',
+    },
+    editButton: {
+        backgroundColor: '#008000',
+        padding: 10,
+        borderRadius: 5,
+        color: '#fff',
+        fontWeight: 'bold',
     },
 });
 
