@@ -14,7 +14,9 @@ function MyList() {
     const navigation = useNavigation()
 
     const getMyLists = async () => {
-        const token = await AsyncStorage.getItem('token');
+        const storageJSON = await AsyncStorage.getItem('storage')
+        const storageData = JSON.parse(storageJSON)
+        const token = storageData.token
 
         fetch(`${API}/myLists`, {
             method: 'GET',
@@ -46,7 +48,9 @@ function MyList() {
     }
 
     const handleDeleteAnime = async (animeId) => {
-        const token = await AsyncStorage.getItem('token');
+        const storageJSON = await AsyncStorage.getItem('storage')
+        const storageData = JSON.parse(storageJSON)
+        const token = storageData.token
         fetch(`${API}/delMyLists`, {
             method: 'DELETE',
             headers: {

@@ -35,8 +35,8 @@ function Home() {
     }
 
     const myList = async () => {
-        const token = await AsyncStorage.getItem('token');
-        if (token) {
+        const storageJSON = await AsyncStorage.getItem('storage')
+        if (storageJSON) {
             navigation.navigate('My list')
         } else {
             //todo

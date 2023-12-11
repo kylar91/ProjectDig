@@ -74,8 +74,9 @@ app.post('/login', async (req, res) => {
     }
 
     const token = jwt.sign({ userId: user._id }, secretKey)
-    const insertToken = tokens({ token })
-    res.json({ token })
+    const insertToken = await tokens({ token })
+    const result = { token, username }
+    res.json(result)
   } catch (error) {
     res.status(500).json({ error: 'Errore durante il login.' })
   }

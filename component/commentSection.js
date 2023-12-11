@@ -23,8 +23,11 @@ function CommentSection({ animeId }) {
 
     const handleCommentSubmit = async () => {
         // Invia il commento al server
-        const token = await AsyncStorage.getItem('token');
-        if (token) {
+        const storageJSON = await AsyncStorage.getItem('storage')
+        if (storageJSON) {
+            const storageData = JSON.parse(storageJSON)
+            const token = storageData.token
+            const user = storageData.user
             fetch(`${API}/comments/${animeId}/comment`, {
                 method: 'POST',
                 headers: {

@@ -18,8 +18,10 @@ function AnimeDetails({ route }) {
     }, [animeId]);
 
     const addOnList = async (nameListIndex) => {
-        const token = await AsyncStorage.getItem('token');
-        if (token) {
+        const storageJSON = await AsyncStorage.getItem('storage')
+        if (storageJSON) {
+            const storageData = JSON.parse(storageJSON)
+            const token = storageData.token
             fetch(`${API}/addMyLists`, {
                 method: 'POST',
                 headers: {

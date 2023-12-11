@@ -41,8 +41,12 @@ function Login({ navigation, route }) {
                 return response.json()
             })
             .then(data => {
-                const token = data.token
-                return AsyncStorage.setItem('token', token)
+                const storage = {
+                    token: data.token,
+                    user: data.username
+                }
+                const storageJSON = JSON.stringify(storage)
+                return AsyncStorage.setItem('storage', storageJSON)
             })
             .then(() => {
                 increaseForceUpdate()

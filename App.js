@@ -47,7 +47,9 @@ const LogButton = (props) => {
 }
 
 const logout = async (setForceUpdate) => {
-  const token = await AsyncStorage.getItem('token')
+  const storageJSON = await AsyncStorage.getItem('storage')
+  const storageData = JSON.parse(storageJSON)
+  const token = storageData.token
 
   fetch(`${API}/logout`, {
     method: 'Delete',
@@ -65,7 +67,7 @@ const logout = async (setForceUpdate) => {
       return response.json()
     })
     .then(() => {
-      AsyncStorage.removeItem('token')
+      AsyncStorage.removeItem('storage')
         .then(() => {
           decreaseForceUpdate(setForceUpdate)
           Alert.alert('Logout effettuato')
@@ -89,8 +91,8 @@ export default function App() {
 
   useEffect(() => {
     const getToken = async () => {
-      const token = await AsyncStorage.getItem('token')
-      if (token) {
+      const storageJSON = await AsyncStorage.getItem('storage')
+      if (storageJSON) {
         setCheckLog(true)
       } else {
         setCheckLog(false)
