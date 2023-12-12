@@ -1,12 +1,16 @@
 import { API } from '../Config';
-import React, { useState, useEffect } from 'react';
-import { View, TextInput, TouchableOpacity, Text, StyleSheet, FlatList, Alert } from 'react-native';
+import { useState, useEffect } from 'react';
+import { View, TextInput, TouchableOpacity, Text, StyleSheet, FlatList, Alert, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Modal from 'react-native-modal';
 
 function CommentSection({ animeId }) {
     const [newComment, setNewComment] = useState('');
+    const [editComment, setEditComment] = useState('');
+    const [idComment, setIdComment] = useState('');
     const [comments, setComments] = useState([]);
     const [forceRerender, setForceRerender] = useState(false);
+    const [isModalVisible, setModalVisible] = useState(false)
     const [user, setUser] = useState('')
     const [token, setToken] = useState('')
 
@@ -84,13 +88,12 @@ function CommentSection({ animeId }) {
     )
 
     const handleDeleteComment = (commentId) => {
-        fetch(`${API}/comments/:id/comment/del`, {
+        fetch(`${API}/comments/${animeId}/comment`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                animeId: animeId,
                 commentId: commentId,
             })
         })
@@ -110,8 +113,42 @@ function CommentSection({ animeId }) {
             });
     }
 
+    const toggleModal = () => {
+        setModalVisible(!isModalVisible);
+    };
+
     const handleEditComment = (commentId) => {
-        //todo
+        setIdComment(commentId)
+        toggleModal()
+
+    }
+
+    const handleModalSubmit = () => {
+        fetch(`${API}/comments/${animeId}/comment`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                commentId: idComment,
+                newText: editComment,
+            })
+        })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(error => {
+                        throw error;
+                    });
+                }
+                return response.json();
+            })
+            .then(() => {
+                setForceRerender(!forceRerender)
+            })
+            .catch(error => {
+                Alert.alert('Error', error.error);
+            });
+        toggleModal();
     }
 
     return (
@@ -128,6 +165,23 @@ function CommentSection({ animeId }) {
                     <Text style={styles.commentButtonText}>Invia</Text>
                 </TouchableOpacity>
             </View>
+            {/* Finestra modale */}
+            <Modal isVisible={isModalVisible} onBackdropPress={toggleModal}>
+                <View style={styles.modalContainer}>
+                    <TextInput
+                        style={styles.commentInput}
+                        placeholder="Modifica il commento..."
+                        placeholderTextColor="#fff"
+                        multiline
+                        numberOfLines={4}
+                        value={editComment}
+                        onChangeText={(text) => setEditComment(text)}
+                    />
+                    <TouchableOpacity style={styles.commentButton} onPress={handleModalSubmit}>
+                        <Text style={styles.commentButtonText}>Invia</Text>
+                    </TouchableOpacity>
+                </View>
+            </Modal>
             {comments !== null && (
                 <FlatList
                     data={comments.comments}
@@ -217,6 +271,16 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         color: '#fff',
         fontWeight: 'bold',
+    },
+
+    modalContainer: {
+        zIndex: 3,
+        backgroundColor: '#2E2E2E',
+        padding: 16,
+        borderRadius: 8,
+        height: 150, // Imposta la larghezza della finestra modale
+        width: '90%',
+        alignSelf: 'center',
     },
 });
 

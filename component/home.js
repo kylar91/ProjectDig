@@ -1,5 +1,5 @@
 import { API } from '../Config'
-import React, { useEffect, useState } from 'react'
+import { useState, useEffect } from 'react';
 import { View, Text, Image, TouchableOpacity, TextInput, StyleSheet, FlatList } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import AsyncStorage from '@react-native-async-storage/async-storage';

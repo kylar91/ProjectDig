@@ -1,5 +1,5 @@
 import { API } from './Config'
-import React, { useEffect, useState } from 'react'
+import { useState, useEffect } from 'react';
 import { Button, Alert } from 'react-native'
 import { NavigationContainer, useNavigation } from '@react-navigation/native'
 import { createStackNavigator } from '@react-navigation/stack'

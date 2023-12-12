@@ -1,5 +1,5 @@
 import { API } from '../Config';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, FlatList, TextInput, TouchableOpacity, Alert } from 'react-native';
 import CommentSection from './commentSection';
 import AsyncStorage from '@react-native-async-storage/async-storage';

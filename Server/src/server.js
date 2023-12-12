@@ -176,11 +176,12 @@ app.delete('/myLists/del', async (req, res) => {
   }
 })
 
-app.delete('/comments/:id/comment/del', async (req, res) => {
+app.delete('/comments/:id/comment', async (req, res) => {
   try {
-    const { animeId, commentId } = req.body
+    const id = req.params.id
+    const { commentId } = req.body
 
-    const result = await delComment(animeId, commentId)
+    const result = await delComment(id, commentId)
 
     if (result.modifiedCount > 0) {
       res.json({ success: true, message: 'Commento rimosso con successo.' })
@@ -195,13 +196,12 @@ app.delete('/comments/:id/comment/del', async (req, res) => {
   }
 })
 
-//ok
-
-app.put('/comments/:id/comment/put', async (req, res) => {
+app.put('/comments/:id/comment', async (req, res) => {
   try {
-    const { animeId, commentId, newText } = req.body
+    const id = req.params.id
+    const { commentId, newText } = req.body
 
-    const result = await putComment(animeId, commentId, newText)
+    const result = await putComment(id, commentId, newText)
 
     if (result.modifiedCount > 0) {
       res.json({ success: true, message: 'Commento modificato con successo.' })
@@ -215,6 +215,8 @@ app.put('/comments/:id/comment/put', async (req, res) => {
     })
   }
 })
+
+//ok
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`)
