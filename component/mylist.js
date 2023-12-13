@@ -51,7 +51,7 @@ function MyList() {
         const storageJSON = await AsyncStorage.getItem('storage')
         const storageData = JSON.parse(storageJSON)
         const token = storageData.token
-        fetch(`${API}/myLists/del`, {
+        fetch(`${API}/myLists`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',

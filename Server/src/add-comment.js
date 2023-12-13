@@ -3,7 +3,7 @@ const { ObjectId } = require("mongodb")
 const connection = require('./connection')
 const select = require('./select-data')
 
-async function addComment(animeId, user, newComment) {
+async function addComment(animeId, user, userId, newComment) {
     const allComments = await select('Comments', animeId)
     const time = new Date()
     const formattedDate = time.toLocaleString()
@@ -13,6 +13,7 @@ async function addComment(animeId, user, newComment) {
 
     const comment = {
         _id: new ObjectId(),
+        user_id: new ObjectId(userId),
         username: user,
         data: formattedDate,
         comment: newComment

@@ -22,6 +22,8 @@ const addComment = require('./add-comment')
 const delOnList = require('./del-on-list')
 const delComment = require('./del-comment')
 const putComment = require('./put-comment')
+const putUser = require('./put-user')
+const delUser = require('./del-user')
 
 app.get('/anime', async (req, res) => {
   try {
@@ -104,8 +106,7 @@ app.get('/token', async (req, res) => {
   res.json(result)
 })
 
-//post or put? add?
-app.post('/myLists/add', async (req, res) => {
+app.post('/myLists', async (req, res) => {
   try {
     const { animeId, token, nameList } = req.body
     const decodedToken = jwt.verify(token, secretKey)
@@ -133,9 +134,11 @@ app.get('/comments/:id', async (req, res) => {
 app.post('/comments/:id/comment', async (req, res) => {
   try {
     const id = req.params.id
-    const { user, comment } = req.body
+    const { token, user, comment } = req.body
+    const decodedToken = jwt.verify(token, secretKey)
+    const userId = decodedToken.userId
 
-    const result = await addComment(id, user, comment)
+    const result = await addComment(id, user, userId, comment)
 
     res.status(201).json({ success: true })
   } catch {
@@ -155,7 +158,7 @@ app.get('/myLists', async (req, res) => {
   }
 })
 
-app.delete('/myLists/del', async (req, res) => {
+app.delete('/myLists', async (req, res) => {
   try {
     const { animeId, token, nameList } = req.body
     const decodedToken = jwt.verify(token, secretKey)
@@ -216,7 +219,97 @@ app.put('/comments/:id/comment', async (req, res) => {
   }
 })
 
+app.get('/user', async (req, res) => {
+  try {
+    const token = req.headers.authorization.split(' ')[1]
+    const decodedToken = jwt.verify(token, secretKey)
+    const userId = decodedToken.userId
+    const user = await select('Users', userId)
+
+    const result = {
+      username: user.username,
+      email: user.email
+    }
+
+    res.json(result)
+
+  } catch (error) {
+    res.status(500).json({ error: `Errore nel server` })
+  }
+})
+
+app.put('/user', async (req, res) => {
+  try {
+    const { token, dataField, newData, oldPass } = req.body
+    const decodedToken = jwt.verify(token, secretKey)
+    const userId = decodedToken.userId
+
+    if (oldPass && oldPass === newData) {
+      res.status(400).json({ error: 'Nuova password uguale a quella corrente' })
+    }
+
+    let result = undefined
+    if (dataField == 'password') {
+      const user = await select('Users', userId)
+      const passwordMatch = await bcrypt.compare(oldPass, user.password)
+
+      if (passwordMatch) {
+        const hashedPassword = await bcrypt.hash(newData, 10)
+        result = await putUser(userId, dataField, hashedPassword)
+      } else {
+        const error = 'Credenziali errate'
+        throw error
+      }
+    } else {
+      result = await putUser(userId, dataField, newData)
+    }
+
+    if (result && result.modifiedCount > 0) {
+      res.json({ success: true, message: 'Modificato con successo.' })
+    } else {
+      res.status(204).json({ success: false, error: 'Modifica non effettuata.' })
+    }
+  } catch (error) {
+    if (error) {
+      res.status(400).json({ error: error })
+    } else {
+      res.status(500).json({ error: 'Errore durante la modifica.' })
+    }
+  }
+})
+
 //ok
+
+app.delete('/user', async (req, res) => {
+  try {
+    const { token, password } = req.body
+    const decodedToken = jwt.verify(token, secretKey)
+    const userId = decodedToken.userId
+    const user = await select('Users', userId)
+    const passwordMatch = await bcrypt.compare(password, user.password)
+
+    let result = ""
+
+    if (passwordMatch) {
+      result = await delUser(userId, token)
+    } else {
+      const error = 'Credenziali errate'
+      throw error
+    }
+
+    if (result && result.deletedCount > 0) {
+      res.json({ success: true, message: 'Account rimosso con successo.' })
+    } else {
+      res.status(404).json({ success: false, error: 'Account non trovato.' })
+    }
+  } catch (error) {
+    if (error) {
+      res.status(400).json({ error: error })
+    } else {
+      res.status(500).json({ error: `Errore durante la rimozione dell' account.` })
+    }
+  }
+})
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`)

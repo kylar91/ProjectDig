@@ -4,13 +4,9 @@ import { View, Text, Button, TextInput, StyleSheet, Alert } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
 function Login({ navigation, route }) {
+    const { setForceUpdate } = route.params
     const [inputUsername, setInputUsername] = useState('')
     const [inputPass, setInputPass] = useState('')
-    const { setForceUpdate } = route.params
-
-    const increaseForceUpdate = () => {
-        setForceUpdate(prevValue => prevValue + 1)
-    }
 
     const handleInputChangeEmail = (text) => {
         setInputUsername(text)
@@ -49,7 +45,7 @@ function Login({ navigation, route }) {
                 return AsyncStorage.setItem('storage', storageJSON)
             })
             .then(() => {
-                increaseForceUpdate()
+                setForceUpdate(value => !value)
                 navigation.navigate('Home')
             })
             .catch(error => {

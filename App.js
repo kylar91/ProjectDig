@@ -9,6 +9,7 @@ import AnimeDetails from './component/dettagliAnime.js'
 import Login from './component/login.js'
 import Singin from './component/singin.js'
 import MyList from './component/mylist.js'
+import Settings from './component/settings.js'
 import styles from './css.js'
 
 const Stack = createStackNavigator()
@@ -69,7 +70,7 @@ const logout = async (setForceUpdate) => {
     .then(() => {
       AsyncStorage.removeItem('storage')
         .then(() => {
-          decreaseForceUpdate(setForceUpdate)
+          setForceUpdate(value => !value)
           Alert.alert('Logout effettuato')
         })
         .catch(error => {
@@ -81,13 +82,9 @@ const logout = async (setForceUpdate) => {
     })
 }
 
-const decreaseForceUpdate = (setForceUpdate) => {
-  setForceUpdate(prevValue => prevValue - 1)
-}
-
 export default function App() {
   const [checkLog, setCheckLog] = useState(false)
-  const [forceUpdate, setForceUpdate] = useState(0)
+  const [forceUpdate, setForceUpdate] = useState(false)
 
   useEffect(() => {
     const getToken = async () => {
@@ -150,6 +147,14 @@ export default function App() {
           component={MyList}
           options={{
             title: 'Le mie liste',
+          }}
+        />
+        <Stack.Screen
+          name="Settings"
+          component={Settings}
+          initialParams={{ setForceUpdate }}
+          options={{
+            title: 'Impostazioni Account',
           }}
         />
       </Stack.Navigator>

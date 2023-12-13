@@ -34,17 +34,13 @@ function Home() {
         setFilteredAnime(filtered)
     }
 
-    const myList = async () => {
+    const buttonsFooter = async (str) => {
         const storageJSON = await AsyncStorage.getItem('storage')
         if (storageJSON) {
-            navigation.navigate('My list')
+            navigation.navigate(`${str}`)
         } else {
             //todo
         }
-    }
-
-    const settings = () => {
-        //todo
     }
 
     const renderItem = ({ item }) => (
@@ -81,10 +77,12 @@ function Home() {
 
             {/* Footer Fisso */}
             <View style={styles.footer}>
-                <TouchableOpacity style={styles.footerButton} onPress={() => myList()}>
+                <TouchableOpacity style={styles.footerButton}
+                    onPress={() => buttonsFooter('My list')}>
                     <Text style={styles.footerButtonText}>Le mie liste</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.footerButton} onPress={() => settings()}>
+                <TouchableOpacity style={styles.footerButton}
+                    onPress={() => buttonsFooter('Settings')}>
                     <Text style={styles.footerButtonText}>impostazioni</Text>
                 </TouchableOpacity>
             </View>

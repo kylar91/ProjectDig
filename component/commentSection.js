@@ -42,6 +42,7 @@ function CommentSection({ animeId }) {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
+                    token: token,
                     user: user,
                     comment: newComment
                 })
@@ -274,7 +275,6 @@ const styles = StyleSheet.create({
     },
 
     modalContainer: {
-        zIndex: 3,
         backgroundColor: '#2E2E2E',
         padding: 16,
         borderRadius: 8,
