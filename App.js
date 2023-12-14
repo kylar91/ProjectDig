@@ -1,6 +1,6 @@
 import { API } from './Config'
-import { useState, useEffect } from 'react';
-import { Button, Alert } from 'react-native'
+import { useState, useEffect } from 'react'
+import { Alert, TouchableOpacity, Text, StyleSheet } from 'react-native'
 import { NavigationContainer, useNavigation } from '@react-navigation/native'
 import { createStackNavigator } from '@react-navigation/stack'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -17,25 +17,27 @@ const Stack = createStackNavigator()
 const LoginButton = () => {
   const navigation = useNavigation()
   return (
-    <Button
+    <TouchableOpacity
       onPress={() => {
         navigation.navigate('Login')
       }}
-      title='Accedi'
-      color="black"
-    />
+      style={styles.button}
+    >
+      <Text style={{ color: 'white' }}>Accedi</Text>
+    </TouchableOpacity>
   )
 }
 
 const LogoutButton = (props) => {
   return (
-    <Button
+    <TouchableOpacity
       onPress={() => {
         logout(props.update)
       }}
-      title='Disconnettiti'
-      color="black"
-    />
+      style={styles.button}
+    >
+      <Text style={styles.text}>Disconnettiti</Text>
+    </TouchableOpacity>
   )
 }
 
@@ -115,9 +117,8 @@ export default function App() {
           component={Home}
           options={{
             title: 'Home',
-            headerRight: () => <LogButton flag={checkLog} update={setForceUpdate}
-            />,
-            headerRightContainerStyle: { marginRight: 15 },
+            headerRight: () => <LogButton flag={checkLog} update={setForceUpdate} />,
+            // headerRightContainerStyle: { marginRight: 15 },
           }}
         />
         <Stack.Screen
@@ -138,6 +139,7 @@ export default function App() {
         <Stack.Screen
           name="Sing-in"
           component={Singin}
+          initialParams={{ setForceUpdate }}
           options={{
             title: 'Registrati',
           }}

@@ -1,13 +1,14 @@
 import { API } from '../Config'
-import { useState, useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity, TextInput, StyleSheet, FlatList, Alert } from 'react-native'
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useState, useEffect } from 'react'
+import { View, Text, TouchableOpacity, TextInput, StyleSheet, Alert } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useNavigation } from '@react-navigation/native'
-import Modal from 'react-native-modal';
+import Modal from 'react-native-modal'
+import styles from '.././css.js'
 
 function Settings({ route }) {
     const { setForceUpdate } = route.params
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState(null)
     const [isModalVisible, setModalVisible] = useState(false)
     const [rerenderSettings, setRerenderSettings] = useState(false)
     const [textInput, setTextInput] = useState('')
@@ -38,16 +39,16 @@ function Settings({ route }) {
 
     useEffect(() => {
         getUser()
-    }, [rerenderSettings]);
+    }, [rerenderSettings])
 
     const toggleModal = () => {
-        setModalVisible(!isModalVisible);
+        setModalVisible(!isModalVisible)
         if (textDelete) {
             setTextDelete(!textDelete)
         }
         setPasswordInput('')
         setTextInput('')
-    };
+    }
 
     const handleModalSubmit = async () => {
         const storageJSON = await AsyncStorage.getItem('storage')
@@ -69,10 +70,10 @@ function Settings({ route }) {
             .then(response => {
                 if (!response.ok) {
                     return response.json().then(error => {
-                        throw error;
-                    });
+                        throw error
+                    })
                 }
-                return response.json();
+                return response.json()
             })
             .then(() => {
                 if (field == 'username') {
@@ -86,9 +87,9 @@ function Settings({ route }) {
                 setRerenderSettings(!rerenderSettings)
             })
             .catch(error => {
-                Alert.alert('Error', error.error);
-            });
-        toggleModal();
+                Alert.alert('Error', error.error)
+            })
+        toggleModal()
     }
 
     const changeCredentials = (str) => {
@@ -100,7 +101,7 @@ function Settings({ route }) {
             const string = 'Inserisci la nuova ' + str
             setPlaceText(string)
         }
-        toggleModal();
+        toggleModal()
     }
 
     const delAccountSafe = () => {
@@ -127,10 +128,10 @@ function Settings({ route }) {
             .then(response => {
                 if (!response.ok) {
                     return response.json().then(error => {
-                        throw error;
-                    });
+                        throw error
+                    })
                 }
-                return response.json();
+                return response.json()
             })
             .then(() => {
                 AsyncStorage.clear()
@@ -138,21 +139,21 @@ function Settings({ route }) {
                 navigation.navigate('Home')
             })
             .catch(error => {
-                Alert.alert('Error', error.error);
-            });
-        toggleModal();
+                Alert.alert('Error', error.error)
+            })
+        toggleModal()
     }
 
     if (!user) {
         return (
-            <View style={styles.container}>
-                <Text style={styles.title}>Caricamento...</Text>
+            <View style={styles.containerSetting}>
+                <Text style={styles.titleSettings}>Caricamento...</Text>
             </View>
         )
     }
 
     return (
-        <View style={styles.container}>
+        <View style={styles.containerSetting}>
             {/* Finestra modale */}
             <Modal isVisible={isModalVisible} onBackdropPress={toggleModal}>
                 <View style={[styles.modalContainer, field === 'password' ? { height: 220 } : { height: 150 }]}>
@@ -177,100 +178,31 @@ function Settings({ route }) {
                     />
                     <TouchableOpacity style={[styles.commentButton, textDelete ? { backgroundColor: '#ff0000' } : { backgroundColor: '#008000' }]}
                         onPress={textDelete ? delAccount : handleModalSubmit}>
-                        <Text style={styles.commentButtonText}>{textDelete ? 'Elimina account' : `Cambia ${field}`}</Text>
+                        <Text style={styles.footerButtonText}>{textDelete ? 'Elimina account' : `Cambia ${field}`}</Text>
                     </TouchableOpacity>
                 </View>
             </Modal>
-            <Text style={styles.title}>Gestione Account</Text>
-            <Text style={styles.text}>Username: {user.username}</Text>
-            <Text style={styles.text}>Email: {user.email}</Text>
-            <TouchableOpacity style={styles.button}>
+            <Text style={styles.titleSettings}>Gestione Account</Text>
+            <Text style={styles.textSettings}>Username: {user.username}</Text>
+            <Text style={styles.textSettings}>Email: {user.email}</Text>
+            <TouchableOpacity style={styles.buttonSettings}>
                 <Text style={styles.buttonText}
                     onPress={() => changeCredentials('username')} >Cambia Username</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.button}
+            <TouchableOpacity style={styles.buttonSettings}
                 onPress={() => changeCredentials('email')} >
                 <Text style={styles.buttonText}>Cambia Email</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.button}
+            <TouchableOpacity style={styles.buttonSettings}
                 onPress={() => changeCredentials('password')} >
                 <Text style={styles.buttonText}>Cambia Password</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.deleteButton}
+            <TouchableOpacity style={styles.deleteButtonSettings}
                 onPress={() => delAccountSafe()}>
                 <Text style={styles.buttonText}>Elimina Account</Text>
             </TouchableOpacity>
         </View>
-    );
+    )
 }
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#000',
-        padding: 20,
-    },
-    title: {
-        fontSize: 22,
-        color: '#fff',
-        marginBottom: 50,
-        marginTop: 50,
-        fontWeight: 'bold',
-    },
-    text: {
-        fontSize: 18,
-        color: '#fff',
-        marginBottom: 30,
-    },
-    textDel: {
-        fontSize: 15,
-        color: '#fff',
-    },
-    button: {
-        backgroundColor: '#008000',
-        padding: 10,
-        borderRadius: 5,
-        marginBottom: 40,
-    },
-    deleteButton: {
-        backgroundColor: '#ff0000',
-        padding: 10,
-        borderRadius: 5,
-        marginBottom: 10,
-    },
-    buttonText: {
-        color: '#fff',
-        textAlign: 'center',
-    },
-    modalContainer: {
-        backgroundColor: '#2E2E2E',
-        padding: 16,
-        borderRadius: 8,
-        width: '90%',
-        alignSelf: 'center',
-    },
-    commentInput: {
-        flex: 1,
-        height: 40,
-        borderColor: '#fff',
-        borderWidth: 1,
-        paddingLeft: 10,
-        margin: 8,
-        color: '#fff',
-        fontSize: 16,
-    },
-    commentButton: {
-        backgroundColor: '#008000',
-        paddingVertical: 8,
-        paddingHorizontal: 16,
-        borderRadius: 5,
-        margin: 8,
-        alignItems: 'center',
-    },
-    commentButtonText: {
-        color: '#fff',
-        fontWeight: 'bold',
-    },
-});
-
-export default Settings;
+export default Settings

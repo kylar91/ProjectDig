@@ -1,13 +1,13 @@
 //ok
 const { ObjectId } = require("mongodb")
-const connection = require('./connection')
+const getDB = require('./connection')
 const select = require('./select-data')
 
 async function putUser(userId, dataField, newData) {
     let error = ""
     const user = await select('Users', userId)
 
-    let db = await connection()
+    let db = await getDB()
     let col = db.collection("Users")
     let commentsCol = db.collection("Comments")
 

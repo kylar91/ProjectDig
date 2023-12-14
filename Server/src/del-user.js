@@ -1,10 +1,10 @@
 const { ObjectId } = require("mongodb")
-const connection = require('./connection')
+const getDB = require('./connection')
 const logout = require('./logout-user')
 
 async function delUser(userId, token) {
 
-    let db = await connection()
+    let db = await getDB()
     let col = db.collection("Users")
 
     let result = await col.deleteOne({ _id: new ObjectId(userId) })

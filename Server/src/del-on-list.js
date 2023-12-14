@@ -1,9 +1,9 @@
 //ok
 const { ObjectId } = require("mongodb")
-const connection = require('./connection')
+const getDB = require('./connection')
 
 async function delOnList(animeId, userId, nameList) {
-    let db = await connection()
+    let db = await getDB()
     let col = db.collection("List")
 
     const query = {

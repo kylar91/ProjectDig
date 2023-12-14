@@ -1,13 +1,16 @@
 import { API } from '../Config'
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
 import { View, Text, Image, TouchableOpacity, TextInput, StyleSheet, FlatList } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import Modal from 'react-native-modal'
+import styles from '.././css.js'
 
 function Home() {
     const [listAnime, setListAnime] = useState([])
     const [searchQuery, setSearchQuery] = useState('')
     const [filteredAnime, setFilteredAnime] = useState([])
+    const [isModalVisible, setModalVisible] = useState(false)
     const navigation = useNavigation()
 
     useEffect(() => {
@@ -39,7 +42,7 @@ function Home() {
         if (storageJSON) {
             navigation.navigate(`${str}`)
         } else {
-            //todo
+            toggleModal()
         }
     }
 
@@ -52,9 +55,18 @@ function Home() {
         </TouchableOpacity>
     )
 
+    const toggleModal = () => {
+        setModalVisible(!isModalVisible)
+    }
+
     return (
         <View style={styles.container}>
             <View style={styles.containerFlat}>
+                <Modal isVisible={isModalVisible} onBackdropPress={toggleModal}>
+                    <View style={styles.modalContainer}>
+                        <Text style={styles.footerButtonText}>funzionalità disponibile solo per utenti registrati</Text>
+                    </View>
+                </Modal>
                 <Text style={styles.headerText}>Anime</Text>
 
                 {/* Barra di Ricerca */}
@@ -89,81 +101,5 @@ function Home() {
         </View>
     )
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#000', // Colore di sfondo nero
-    },
-    containerFlat: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginBottom: 60,
-    },
-    headerText: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 20,
-        color: '#fff', // Testo bianco
-    },
-    searchInput: {
-        height: 40,
-        borderColor: '#fff', // Bordo bianco
-        borderWidth: 1,
-        marginBottom: 10,
-        paddingLeft: 10,
-        width: 250,
-        color: '#fff', // Testo bianco
-    },
-    listContainer: {
-        paddingHorizontal: 16,
-    },
-    itemContainer: {
-        marginBottom: 16,
-        backgroundColor: '#008000', // Colore verde
-        borderRadius: 8,
-        padding: 16,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.3,
-        shadowRadius: 2,
-        elevation: 3,
-    },
-    image: {
-        width: '100%',
-        height: 150,
-        borderRadius: 8,
-        marginBottom: 8,
-    },
-    title: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#fff', // Testo bianco
-    },
-    footer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        width: '100%',
-        position: 'absolute',
-        bottom: 0,
-        backgroundColor: '#008000',
-        padding: 16,
-        borderTopWidth: 3,
-        borderTopColor: '#000',
-    },
-    footerButton: {
-        flex: 1,
-        backgroundColor: '#000',
-        padding: 8,
-        borderRadius: 8,
-        marginRight: 8,
-        alignItems: 'center',
-    },
-    footerButtonText: {
-        color: '#fff',
-        fontWeight: 'bold',
-    },
-})
 
 export default Home

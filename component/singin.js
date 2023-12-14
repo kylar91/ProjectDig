@@ -1,8 +1,11 @@
 import { API } from '../Config'
 import { View, Text, Button, TextInput, StyleSheet, Alert } from 'react-native'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import styles from '.././css.js'
 
-function Singin({ navigation }) {
+function Singin({ navigation, route }) {
+    const { setForceUpdate } = route.params
     const [inputUsername, setInputUsername] = useState('')
     const [inputEmail, setInputEmail] = useState('')
     const [inputPass, setInputPass] = useState('')
@@ -20,35 +23,74 @@ function Singin({ navigation }) {
     }
 
     const handleRegistration = () => {
-
-        fetch(`${API}/singin`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                email: inputEmail,
-                username: inputUsername,
-                password: inputPass
+        if (!inputEmail || !inputUsername || !inputPass) {
+            Alert.alert('Errore', 'Tutti i campi devono essere riempiti')
+            return
+        }
+        const emailRegex = /^\S+@\S+\.\S+$/
+        if (emailRegex.test(inputEmail)) {
+            fetch(`${API}/singin`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: inputEmail,
+                    username: inputUsername,
+                    password: inputPass
+                })
             })
-        })
-            .then(response => {
-                if (!response.ok) {
-                    return response.json().then(error => {
-                        throw error
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(error => {
+                            throw error
+                        })
+                    }
+                    return response.json()
+                })
+                .then(() => {
+                    return fetch(`${API}/login`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            username: inputUsername,
+                            password: inputPass
+                        })
                     })
-                }
-                return response.json()
-            })
-            .then(data => Alert.alert(data.message))
-            .catch(error => {
-                Alert.alert('Errore', error.error)
-            })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(error => {
+                            throw error
+                        })
+                    }
+                    return response.json()
+                })
+                .then(data => {
+                    const storage = {
+                        token: data.token,
+                        user: data.username
+                    }
+                    const storageJSON = JSON.stringify(storage)
+                    return AsyncStorage.setItem('storage', storageJSON)
+                })
+                .then(() => {
+                    setForceUpdate(value => !value)
+                    navigation.navigate('Home')
+                })
+                .catch(error => {
+                    Alert.alert('Errore', error.error)
+                })
+        } else {
+            Alert.alert('Errore', 'Email non valida')
+        }
     }
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Registrazione</Text>
+        <View style={styles.containerIn}>
+            <Text style={styles.titleIn}>Registrazione</Text>
 
             <TextInput
                 style={styles.input}
@@ -83,29 +125,5 @@ function Singin({ navigation }) {
         </View>
     )
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#000', // Nero
-    },
-    title: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        marginBottom: 20,
-        color: '#fff', // Testo bianco
-    },
-    input: {
-        height: 40,
-        borderColor: 'gray',
-        borderWidth: 1,
-        marginBottom: 10,
-        paddingLeft: 10,
-        width: 250,
-        color: '#fff', // Testo bianco
-    },
-})
 
 export default Singin

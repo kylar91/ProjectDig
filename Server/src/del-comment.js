@@ -1,10 +1,10 @@
 //ok
 const { ObjectId } = require("mongodb")
-const connection = require('./connection')
+const getDB = require('./connection')
 
 async function delComment(animeId, commentId) {
 
-    let db = await connection()
+    let db = await getDB()
     let col = db.collection("Comments")
 
     const query = {

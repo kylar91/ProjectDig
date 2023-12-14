@@ -278,8 +278,6 @@ app.put('/user', async (req, res) => {
   }
 })
 
-//ok
-
 app.delete('/user', async (req, res) => {
   try {
     const { token, password } = req.body

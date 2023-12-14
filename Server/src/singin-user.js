@@ -1,8 +1,8 @@
 //ok
-const connection = require('./connection')
+const getDB = require('./connection')
 
 async function singin({ email, username, password }) {
-    let db = await connection()
+    let db = await getDB()
     let col = db.collection("Users")
 
     const checkEmail = await col.findOne({ email })

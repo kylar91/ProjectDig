@@ -1,12 +1,12 @@
 //ok
 const { ObjectId } = require("mongodb")
-const connection = require('./connection')
+const getDB = require('./connection')
 const select = require('./select-data')
 
 async function addOnList(animeId, userId, nameList) {
     const anime = await select('Anime', animeId)
 
-    let db = await connection()
+    let db = await getDB()
     let col = db.collection("List")
 
     const checkList = await col.findOne({ "_id": new ObjectId(userId) })

@@ -1,9 +1,9 @@
 //ok
 const { ObjectId } = require("mongodb")
-const connection = require('./connection')
+const getDB = require('./connection')
 
 async function select(nameColl, id) {
-  let db = await connection()
+  let db = await getDB()
   let col = db.collection(nameColl)
 
   // Find and return the document

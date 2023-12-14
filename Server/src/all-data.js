@@ -1,8 +1,8 @@
 //ok
-const connection = require('./connection')
+const getDB = require('./connection')
 
 async function all() {
-    let db = await connection()
+    let db = await getDB()
     let col = db.collection("Anime")
 
     // Find and return the document

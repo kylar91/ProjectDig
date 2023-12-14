@@ -1,7 +1,8 @@
 import { API } from '../Config'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { View, Text, Button, TextInput, StyleSheet, Alert } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import styles from '.././css.js'
 
 function Login({ navigation, route }) {
     const { setForceUpdate } = route.params
@@ -54,8 +55,8 @@ function Login({ navigation, route }) {
     }
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Accedi</Text>
+        <View style={styles.containerIn}>
+            <Text style={styles.titleIn}>Accedi</Text>
 
             <TextInput
                 style={styles.input}
@@ -79,7 +80,7 @@ function Login({ navigation, route }) {
                 color="#008000" // Verde
                 onPress={handleLogin}
             />
-            <Text style={styles.text}>Non hai un account?</Text>
+            <Text style={styles.textLogin}>Non hai un account?</Text>
             <Button
                 onPress={() => {
                     navigation.navigate('Sing-in')
@@ -90,34 +91,5 @@ function Login({ navigation, route }) {
         </View>
     )
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#000', // Nero
-    },
-    title: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        marginBottom: 20,
-        color: '#fff', // Testo bianco
-    },
-    text: {
-        fontSize: 17,
-        margin: 10,
-        color: '#fff', // Testo bianco
-    },
-    input: {
-        height: 40,
-        borderColor: 'gray',
-        borderWidth: 1,
-        marginBottom: 10,
-        paddingLeft: 10,
-        width: 250,
-        color: '#fff', // Testo bianco
-    },
-})
 
 export default Login

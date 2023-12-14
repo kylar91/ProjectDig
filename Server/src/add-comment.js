@@ -1,6 +1,6 @@
 //ok
 const { ObjectId } = require("mongodb")
-const connection = require('./connection')
+const getDB = require('./connection')
 const select = require('./select-data')
 
 async function addComment(animeId, user, userId, newComment) {
@@ -8,7 +8,7 @@ async function addComment(animeId, user, userId, newComment) {
     const time = new Date()
     const formattedDate = time.toLocaleString()
 
-    let db = await connection()
+    let db = await getDB()
     let col = db.collection('Comments')
 
     const comment = {

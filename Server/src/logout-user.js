@@ -1,8 +1,8 @@
 //ok
-const connection = require('./connection')
+const getDB = require('./connection')
 
 async function logout({ token }) {
-    let db = await connection()
+    let db = await getDB()
     let col = db.collection("Tokens")
 
     const result = await col.deleteOne({ token })
