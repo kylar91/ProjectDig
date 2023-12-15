@@ -1,4 +1,3 @@
-//ok
 const { ObjectId } = require("mongodb")
 const getDB = require('./connection')
 
@@ -10,15 +9,15 @@ async function putComment(animeId, commentId, newText) {
     const query = {
         _id: new ObjectId(animeId),
         "comments._id": new ObjectId(commentId)
-    };
+    }
 
     const updateQuery = {
         $set: {
             "comments.$.comment": newText
         }
-    };
+    }
 
-    const result = await col.updateOne(query, updateQuery);
+    const result = await col.updateOne(query, updateQuery)
 
     return result
 

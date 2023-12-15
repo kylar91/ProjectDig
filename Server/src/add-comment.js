@@ -1,4 +1,3 @@
-//ok
 const { ObjectId } = require("mongodb")
 const getDB = require('./connection')
 const select = require('./select-data')

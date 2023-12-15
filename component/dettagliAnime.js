@@ -1,17 +1,18 @@
 import { API } from '../Config'
 import { useEffect, useState } from 'react'
-import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity, Alert } from 'react-native'
+import { View, Text, Image, FlatList, TouchableOpacity, Alert } from 'react-native'
 import CommentSection from './commentSection'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import Modal from 'react-native-modal'
 import styles from '.././css.js'
 
 function AnimeDetails({ route }) {
-    const [animeInfo, setAnimeInfo] = useState([])
     const { animeId, setRerenderMyList } = route.params
-    const nameList = ["in_corso", "completati", "droppati"]
+    const [animeInfo, setAnimeInfo] = useState([])
     const [addedToListMessage, setAddedToListMessage] = useState(null)
     const [isModalVisible, setModalVisible] = useState(false)
+    const [addedAnimeToListButton, setAddedAnimeToListButton] = useState(false)
+    const nameList = ["in_corso", "completati", "droppati"]
 
     useEffect(() => {
         fetch(`${API}/anime/${animeId}`)
@@ -45,10 +46,10 @@ function AnimeDetails({ route }) {
                     return response.json()
                 })
                 .then(() => {
+                    setAddedAnimeToListButton(!addedAnimeToListButton)
                     if (setRerenderMyList) {
                         setRerenderMyList(value => !value)
                     }
-                    // da sistemare la scritta in corso
                     setAddedToListMessage(`Anime aggiunto a "${nameListIndex.replace('_', ' ')}" con successo!`)
                     setTimeout(() => {
                         setAddedToListMessage(null)
@@ -58,12 +59,19 @@ function AnimeDetails({ route }) {
                     Alert.alert('Error', error.error)
                 })
         } else {
+            if (addedAnimeToListButton) {
+                setAddedAnimeToListButton(false)
+            }
             toggleModal()
         }
     }
 
     const toggleModal = () => {
         setModalVisible(!isModalVisible)
+    }
+
+    const MonoFooterButton = () => {
+        setAddedAnimeToListButton(!addedAnimeToListButton)
     }
 
     return (
@@ -90,26 +98,34 @@ function AnimeDetails({ route }) {
                         <Text style={styles.infoText}>Stato: {item.stato}</Text>
                         <Text style={styles.infoText}>{item.info}</Text>
 
-                        {/* Sezione Commenti */}
                         <CommentSection animeId={animeId} />
                     </View>
                 )}
                 nestedScrollEnabled={true}
-                style={{ marginBottom: 64, width: '100%' }} // Aggiunto margine inferiore
+                style={{ marginBottom: 64, width: '100%' }}
             />
 
-            {/* Footer Fisso */}
-            <View style={styles.footer}>
-                <TouchableOpacity style={styles.footerButton} onPress={() => addOnList(nameList[0])}>
-                    <Text style={styles.footerButtonText}>In corso</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.footerButton} onPress={() => addOnList(nameList[1])}>
-                    <Text style={styles.footerButtonText}>Completato</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.footerButton} onPress={() => addOnList(nameList[2])}>
-                    <Text style={styles.footerButtonText}>Droppato</Text>
-                </TouchableOpacity>
-            </View>
+            {addedAnimeToListButton ? (
+                <View style={styles.footer}>
+                    <TouchableOpacity style={styles.footerButton} onPress={() => addOnList(nameList[0])}>
+                        <Text style={styles.footerButtonText}>In corso</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.footerButton} onPress={() => addOnList(nameList[1])}>
+                        <Text style={styles.footerButtonText}>Completato</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.footerButton} onPress={() => addOnList(nameList[2])}>
+                        <Text style={styles.footerButtonText}>Droppato</Text>
+                    </TouchableOpacity>
+                </View>
+            ) : (
+                <View style={styles.footer}>
+                    <TouchableOpacity style={styles.footerButton}
+                        onPress={() => MonoFooterButton()}>
+                        <Text style={styles.footerButtonText}>Aggiungi anime ad una lista</Text>
+                    </TouchableOpacity>
+                </View>
+            )}
+
         </View>
     )
 }

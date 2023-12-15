@@ -1,4 +1,3 @@
-//ok
 const { ObjectId } = require("mongodb")
 const getDB = require('./connection')
 const select = require('./select-data')
@@ -16,27 +15,27 @@ async function putUser(userId, dataField, newData) {
         if (!checkNewData) {
             const query = {
                 _id: new ObjectId(userId)
-            };
+            }
 
             const updateQuery = {
                 $set: {
                     [dataField]: newData
                 }
-            };
+            }
 
             const result = await col.updateOne(query, updateQuery)
 
             if (dataField === 'username' && result.modifiedCount > 0) {
                 const commentsUpdateQuery = {
                     $set: { "comments.$[elem].username": newData }
-                };
-                const arrayFilters = [{ "elem.user_id": new ObjectId(userId) }];
+                }
+                const arrayFilters = [{ "elem.user_id": new ObjectId(userId) }]
 
                 const updateComments = await commentsCol.updateMany(
                     {},
                     commentsUpdateQuery,
                     { arrayFilters: arrayFilters }
-                );
+                )
             }
 
             return result

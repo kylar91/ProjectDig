@@ -1,13 +1,16 @@
 import { API } from '../Config'
 import { useState } from 'react'
-import { View, Text, Button, TextInput, StyleSheet, Alert } from 'react-native'
+import { View, Text, Button, TextInput } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import Modal from 'react-native-modal'
 import styles from '.././css.js'
 
 function Login({ navigation, route }) {
     const { setForceUpdate } = route.params
     const [inputUsername, setInputUsername] = useState('')
     const [inputPass, setInputPass] = useState('')
+    const [isModalVisible, setModalVisible] = useState(false)
+    const [textModalError, setTextModalError] = useState('')
 
     const handleInputChangeEmail = (text) => {
         setInputUsername(text)
@@ -18,7 +21,11 @@ function Login({ navigation, route }) {
     }
 
     const handleLogin = () => {
-
+        if (!inputUsername || !inputPass) {
+            setTextModalError('Tutti i campi devono essere riempiti')
+            toggleModal()
+            return
+        }
         fetch(`${API}/login`, {
             method: 'POST',
             headers: {
@@ -50,17 +57,30 @@ function Login({ navigation, route }) {
                 navigation.navigate('Home')
             })
             .catch(error => {
-                Alert.alert('Errore', error.error)
+                setTextModalError(error.error)
+                toggleModal()
             })
+    }
+
+    const toggleModal = () => {
+        setModalVisible(!isModalVisible)
     }
 
     return (
         <View style={styles.containerIn}>
+
+            <Modal isVisible={isModalVisible} onBackdropPress={toggleModal}>
+                <View style={styles.modalContainer}>
+                    <Text style={styles.titleError}>Errore</Text>
+                    <Text style={styles.textError}>{textModalError}</Text>
+                </View>
+            </Modal>
+
             <Text style={styles.titleIn}>Accedi</Text>
 
             <TextInput
                 style={styles.input}
-                placeholder="Username"
+                placeholder="Nome utente"
                 placeholderTextColor="#fff"
                 onChangeText={handleInputChangeEmail}
                 value={inputUsername}
@@ -77,7 +97,7 @@ function Login({ navigation, route }) {
 
             <Button
                 title="Accedi"
-                color="#008000" // Verde
+                color="#008000"
                 onPress={handleLogin}
             />
             <Text style={styles.textLogin}>Non hai un account?</Text>
@@ -86,7 +106,7 @@ function Login({ navigation, route }) {
                     navigation.navigate('Sing-in')
                 }}
                 title='Registrati'
-                color="#008000" // Verde
+                color="#008000"
             />
         </View>
     )

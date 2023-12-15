@@ -1,6 +1,6 @@
 import { API } from '../Config'
 import { useState, useEffect } from 'react'
-import { View, TextInput, TouchableOpacity, Text, StyleSheet, FlatList, Alert } from 'react-native'
+import { View, TextInput, TouchableOpacity, Text, FlatList, Alert } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import Modal from 'react-native-modal'
 import styles from '.././css.js'
@@ -12,6 +12,9 @@ function CommentSection({ animeId }) {
     const [comments, setComments] = useState([])
     const [forceRerender, setForceRerender] = useState(false)
     const [isModalVisible, setModalVisible] = useState(false)
+    const [isModalVisibleTwo, setModalVisibleTwo] = useState(false)
+    const [isModalVisibleMessage, setModalVisibleMessage] = useState(false)
+    const [message, setMessage] = useState('')
     const [user, setUser] = useState('')
     const [token, setToken] = useState('')
 
@@ -35,33 +38,38 @@ function CommentSection({ animeId }) {
     }
 
     const handleCommentSubmit = async () => {
-        // Invia il commento al server
         if (token) {
-            fetch(`${API}/comments/${animeId}/comment`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    token: token,
-                    user: user,
-                    comment: newComment
+            if (newComment) {
+                fetch(`${API}/comments/${animeId}/comment`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        token: token,
+                        user: user,
+                        comment: newComment
+                    })
                 })
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.json().then(error => {
-                            throw error
-                        })
-                    }
-                    return response.json()
-                })
-                .then(() => {
-                    setForceRerender(!forceRerender)
-                })
-                .catch(error => {
-                    Alert.alert('Error', error.error)
-                })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(error => {
+                                throw error
+                            })
+                        }
+                        return response.json()
+                    })
+                    .then(() => {
+                        setForceRerender(!forceRerender)
+                        setMessage('Commento aggiunto')
+                        toggleModalMessage()
+                    })
+                    .catch(error => {
+                        Alert.alert('Error', error.error)
+                    })
+            } else {
+                toggleModalTwo()
+            }
         } else {
             toggleModal()
         }
@@ -80,7 +88,8 @@ function CommentSection({ animeId }) {
                     <TouchableOpacity onPress={() => handleDeleteComment(item._id)}>
                         <Text style={styles.deleteButton}>Elimina</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => handleEditComment(item._id)}>
+                    <TouchableOpacity onPress={() =>
+                        handleEditComment(item._id, item.comment)}>
                         <Text style={styles.editButton}>Modifica</Text>
                     </TouchableOpacity>
                 </View>
@@ -108,6 +117,8 @@ function CommentSection({ animeId }) {
             })
             .then(() => {
                 setForceRerender(!forceRerender)
+                setMessage('Commento eliminato')
+                toggleModalMessage()
             })
             .catch(error => {
                 Alert.alert('Error', error.error)
@@ -116,40 +127,54 @@ function CommentSection({ animeId }) {
 
     const toggleModal = () => {
         setModalVisible(!isModalVisible)
+        editComment ? setEditComment('') : null
+    }
+    const toggleModalTwo = () => {
+        setModalVisibleTwo(!isModalVisibleTwo)
+    }
+    const toggleModalMessage = () => {
+        setModalVisibleMessage(!isModalVisibleMessage)
     }
 
-    const handleEditComment = (commentId) => {
+    const handleEditComment = (commentId, oldComment) => {
         setIdComment(commentId)
+        setEditComment(oldComment)
         toggleModal()
 
     }
 
     const handleModalSubmit = () => {
-        fetch(`${API}/comments/${animeId}/comment`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                commentId: idComment,
-                newText: editComment,
+        if (editComment) {
+            fetch(`${API}/comments/${animeId}/comment`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    commentId: idComment,
+                    newText: editComment,
+                })
             })
-        })
-            .then(response => {
-                if (!response.ok) {
-                    return response.json().then(error => {
-                        throw error
-                    })
-                }
-                return response.json()
-            })
-            .then(() => {
-                setForceRerender(!forceRerender)
-            })
-            .catch(error => {
-                Alert.alert('Error', error.error)
-            })
-        toggleModal()
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(error => {
+                            throw error
+                        })
+                    }
+                    return response.json()
+                })
+                .then(() => {
+                    setForceRerender(!forceRerender)
+                    setMessage('Commento modificato')
+                    toggleModalMessage()
+                })
+                .catch(error => {
+                    Alert.alert('Error', error.error)
+                })
+            toggleModal()
+        } else {
+            toggleModalTwo()
+        }
     }
 
     return (
@@ -166,7 +191,18 @@ function CommentSection({ animeId }) {
                     <Text style={styles.footerButtonText}>Invia</Text>
                 </TouchableOpacity>
             </View>
-            {/* Finestra modale */}
+
+            <Modal isVisible={isModalVisibleTwo} onBackdropPress={toggleModalTwo}>
+                <View style={styles.modalContainer}>
+                    <Text style={styles.commentButtonTextModal}>Scrivi qualcosa per commentare</Text>
+                </View>
+            </Modal>
+            <Modal isVisible={isModalVisibleMessage} onBackdropPress={toggleModalMessage}>
+                <View style={styles.modalContainer}>
+                    <Text style={styles.commentButtonTextModal}>{message}</Text>
+                </View>
+            </Modal>
+
             <Modal isVisible={isModalVisible} onBackdropPress={toggleModal}>
                 {token ? (
                     <View style={styles.modalContainer}>

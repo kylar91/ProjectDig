@@ -1,4 +1,3 @@
-//ok
 const getDB = require('./connection')
 
 async function tokens({ token }) {

@@ -11,7 +11,6 @@ const port = process.env.SERVER_PORT
 app.use(bodyparser.json())
 app.use(cors())
 
-const all = require('./all-data')
 const select = require('./select-data')
 const singin = require('./singin-user')
 const login = require('./login-user')
@@ -27,7 +26,8 @@ const delUser = require('./del-user')
 
 app.get('/anime', async (req, res) => {
   try {
-    const result = await all()
+    const id = ''
+    const result = await select('Anime', id)
     res.json(result)
 
   } catch (error) {
@@ -99,11 +99,6 @@ app.delete('/logout', async (req, res) => {
   } catch (error) {
     res.status(500).json({ success: false, error: 'Errore durante il logout.' })
   }
-})
-
-app.get('/token', async (req, res) => {
-  const result = await all()
-  res.json(result)
 })
 
 app.post('/myLists', async (req, res) => {
@@ -244,16 +239,16 @@ app.put('/user', async (req, res) => {
     const decodedToken = jwt.verify(token, secretKey)
     const userId = decodedToken.userId
 
-    if (oldPass && oldPass === newData) {
-      res.status(400).json({ error: 'Nuova password uguale a quella corrente' })
-    }
-
     let result = undefined
     if (dataField == 'password') {
       const user = await select('Users', userId)
       const passwordMatch = await bcrypt.compare(oldPass, user.password)
 
       if (passwordMatch) {
+        if (oldPass === newData) {
+          const error = 'La nuova password deve essere diversa da quella vecchia'
+          throw error
+        }
         const hashedPassword = await bcrypt.hash(newData, 10)
         result = await putUser(userId, dataField, hashedPassword)
       } else {

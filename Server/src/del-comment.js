@@ -1,4 +1,3 @@
-//ok
 const { ObjectId } = require("mongodb")
 const getDB = require('./connection')
 
@@ -9,7 +8,7 @@ async function delComment(animeId, commentId) {
 
     const query = {
         _id: new ObjectId(animeId)
-    };
+    }
 
     const updateQuery = {
         $pull: {
@@ -19,7 +18,7 @@ async function delComment(animeId, commentId) {
         }
     }
 
-    const result = await col.updateOne(query, updateQuery);
+    const result = await col.updateOne(query, updateQuery)
     return result
 
 }

@@ -236,7 +236,19 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         paddingLeft: 10,
         width: 250,
-        color: '#fff', // Testo bianco
+        color: '#fff',
+    },
+    titleError: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#fff',
+        textAlign: 'center'
+    },
+    textError: {
+        color: '#fff',
+        fontWeight: 'bold',
+        alignSelf: 'center',
+        marginTop: 30,
     },
     //mylists
     firstTitle: {
@@ -244,7 +256,7 @@ const styles = StyleSheet.create({
         fontSize: 24,
         fontWeight: 'bold',
         marginBottom: 20,
-        color: '#fff', // Testo bianco
+        color: '#fff',
         justifyContent: 'center',
         alignItems: 'center',
         marginTop: '80%',

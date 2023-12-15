@@ -1,6 +1,6 @@
 import { API } from '../Config'
 import { useState, useEffect } from 'react'
-import { View, Text, Image, TouchableOpacity, TextInput, StyleSheet, FlatList } from 'react-native'
+import { View, Text, Image, TouchableOpacity, TextInput, FlatList } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import Modal from 'react-native-modal'
@@ -64,12 +64,11 @@ function Home() {
             <View style={styles.containerFlat}>
                 <Modal isVisible={isModalVisible} onBackdropPress={toggleModal}>
                     <View style={styles.modalContainer}>
-                        <Text style={styles.footerButtonText}>funzionalità disponibile solo per utenti registrati</Text>
+                        <Text style={styles.commentButtonTextModal}>funzionalità disponibile solo per utenti registrati</Text>
                     </View>
                 </Modal>
                 <Text style={styles.headerText}>Anime</Text>
 
-                {/* Barra di Ricerca */}
                 <TextInput
                     style={styles.searchInput}
                     placeholder="Cerca per nome..."
@@ -87,7 +86,6 @@ function Home() {
             </View>
 
 
-            {/* Footer Fisso */}
             <View style={styles.footer}>
                 <TouchableOpacity style={styles.footerButton}
                     onPress={() => buttonsFooter('My list')}>

@@ -1,6 +1,6 @@
 import { API } from '../Config'
 import { useState, useEffect } from 'react'
-import { View, Text, Image, TouchableOpacity, TextInput, StyleSheet, FlatList, Alert } from 'react-native'
+import { View, Text, Image, TouchableOpacity, TextInput, FlatList, Alert } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import styles from '.././css.js'
 
@@ -82,7 +82,6 @@ function MyList({ navigation }) {
             <View style={styles.itemContainer}>
                 <Image source={{ uri: item.img }} style={styles.image} />
                 <Text style={styles.title}>{item.anime}</Text>
-                {/* Aggiungi il bottone di eliminazione */}
                 <TouchableOpacity
                     style={styles.deleteButtonList}
                     onPress={() => handleDeleteAnime(item._id)}
@@ -108,36 +107,49 @@ function MyList({ navigation }) {
     return (
         <View style={styles.container}>
             <View style={styles.containerFlat}>
-                {list ? (
+                {list && filteredMyListAnime ? (
                     <View>
-                        <Text style={styles.headerText}>La tua lista {list.replace('_', ' ')}</Text>
-                        {/* Barra di Ricerca */}
-                        <TextInput
-                            style={styles.searchInput}
-                            placeholder="Cerca per nome..."
-                            placeholderTextColor="#fff"
-                            onChangeText={handleSearch}
-                            value={searchQuery}
-                        />
+                        {filteredMyListAnime[list][0] ?
+                            (
+                                <View>
+                                    <Text style={styles.headerText}>La tua lista {list.replace('_', ' ')}</Text>
+                                    <TextInput
+                                        style={styles.searchInput}
+                                        placeholder="Cerca per nome..."
+                                        placeholderTextColor="#fff"
+                                        onChangeText={handleSearch}
+                                        value={searchQuery}
+                                    />
+                                </View>
+                            ) : (
+                                <Text style={styles.firstTitle}>La tua lista {list.replace('_', ' ')} è vuota</Text>
+                            )}
                     </View>
 
-                ) : (
-                    <View>
-                        <Text style={styles.firstTitle}>Seleziona una lista</Text>
-                    </View>
+                ) :
+                    !filteredMyListAnime ? (
+                        <View>
+                            <Text style={styles.firstTitle}>Le tue liste sono vuote</Text>
+                        </View>
+                    ) : (
+                        <View>
+                            <Text style={styles.firstTitle}>Seleziona una lista</Text>
+                        </View>
+                    )
+                }
+
+                {filteredMyListAnime && (
+                    <FlatList
+                        data={filteredMyListAnime[list]}
+                        keyExtractor={(item) => item._id.toString()}
+                        renderItem={renderItem}
+                        contentContainerStyle={styles.listContainer}
+                    />
                 )}
 
-
-                <FlatList
-                    data={filteredMyListAnime[list]}
-                    keyExtractor={(item) => item._id.toString()}
-                    renderItem={renderItem}
-                    contentContainerStyle={styles.listContainer}
-                />
             </View>
 
 
-            {/* Footer Fisso */}
             <View style={styles.footer}>
                 <TouchableOpacity style={styles.footerButton} onPress={() => myList(nameList[0])}>
                     <Text style={styles.footerButtonText}>In corso</Text>

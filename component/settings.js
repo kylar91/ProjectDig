@@ -1,6 +1,6 @@
 import { API } from '../Config'
 import { useState, useEffect } from 'react'
-import { View, Text, TouchableOpacity, TextInput, StyleSheet, Alert } from 'react-native'
+import { View, Text, TouchableOpacity, TextInput } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useNavigation } from '@react-navigation/native'
 import Modal from 'react-native-modal'
@@ -9,8 +9,11 @@ import styles from '.././css.js'
 function Settings({ route }) {
     const { setForceUpdate } = route.params
     const [user, setUser] = useState(null)
+    const [flagError, setFlagError] = useState(false)
     const [isModalVisible, setModalVisible] = useState(false)
+    const [isModalVisibleTwo, setModalVisibleTwo] = useState(false)
     const [rerenderSettings, setRerenderSettings] = useState(false)
+    const [textModalError, setTextModalError] = useState('')
     const [textInput, setTextInput] = useState('')
     const [passwordInput, setPasswordInput] = useState('')
     const [placeText, setPlaceText] = useState('')
@@ -50,46 +53,89 @@ function Settings({ route }) {
         setTextInput('')
     }
 
+    const toggleModalTwo = () => {
+        setModalVisibleTwo(!isModalVisibleTwo)
+    }
+
     const handleModalSubmit = async () => {
         const storageJSON = await AsyncStorage.getItem('storage')
         const storageData = JSON.parse(storageJSON)
         const token = storageData.token
 
-        fetch(`${API}/user`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                token: token,
-                dataField: field,
-                newData: textInput,
-                oldPass: passwordInput,
+        if (field === 'password') {
+            if (!textInput || !passwordInput) {
+                setFlagError(true)
+                setTextModalError('Tutti i campi devono essere riempiti')
+                toggleModalTwo()
+                return
+            }
+        } else {
+            if (!textInput) {
+                setFlagError(true)
+                setTextModalError('Tutti i campi devono essere riempiti')
+                toggleModalTwo()
+                return
+            }
+        }
+        let testRegex = true
+        if (field === 'email') {
+            const regex = /^\S+@\S+\.\S+$/
+            testRegex = regex.test(textInput)
+        }
+        if (field === 'username') {
+            const regex = /^\S+$/
+            testRegex = regex.test(textInput)
+        }
+        if (testRegex) {
+            fetch(`${API}/user`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    token: token,
+                    dataField: field,
+                    newData: textInput,
+                    oldPass: passwordInput,
+                })
             })
-        })
-            .then(response => {
-                if (!response.ok) {
-                    return response.json().then(error => {
-                        throw error
-                    })
-                }
-                return response.json()
-            })
-            .then(() => {
-                if (field == 'username') {
-                    const storage = {
-                        token: token,
-                        user: textInput
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(error => {
+                            throw error
+                        })
                     }
-                    const storageJSON = JSON.stringify(storage)
-                    AsyncStorage.setItem('storage', storageJSON)
-                }
-                setRerenderSettings(!rerenderSettings)
-            })
-            .catch(error => {
-                Alert.alert('Error', error.error)
-            })
-        toggleModal()
+                    return response.json()
+                })
+                .then(data => {
+                    if (field == 'username') {
+                        const storage = {
+                            token: token,
+                            user: textInput
+                        }
+                        const storageJSON = JSON.stringify(storage)
+                        AsyncStorage.setItem('storage', storageJSON)
+                    }
+                    setRerenderSettings(!rerenderSettings)
+                    setFlagError(false)
+                    setTextModalError(data.message)
+                    toggleModalTwo()
+                })
+                .catch(error => {
+                    setFlagError(true)
+                    setTextModalError(error.error)
+                    toggleModalTwo()
+                })
+            toggleModal()
+        } else {
+            setFlagError(true)
+            if (field === 'email') {
+                setTextModalError('Email non valida')
+            } else {
+                setTextModalError('Il nome utente non può contenere spazi')
+            }
+            toggleModalTwo()
+        }
     }
 
     const changeCredentials = (str) => {
@@ -114,34 +160,41 @@ function Settings({ route }) {
         const storageJSON = await AsyncStorage.getItem('storage')
         const storageData = JSON.parse(storageJSON)
         const token = storageData.token
-
-        fetch(`${API}/user`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                token,
-                password: textInput,
+        if (textInput) {
+            fetch(`${API}/user`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    token,
+                    password: textInput,
+                })
             })
-        })
-            .then(response => {
-                if (!response.ok) {
-                    return response.json().then(error => {
-                        throw error
-                    })
-                }
-                return response.json()
-            })
-            .then(() => {
-                AsyncStorage.clear()
-                setForceUpdate(value => !value)
-                navigation.navigate('Home')
-            })
-            .catch(error => {
-                Alert.alert('Error', error.error)
-            })
-        toggleModal()
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(error => {
+                            throw error
+                        })
+                    }
+                    return response.json()
+                })
+                .then(() => {
+                    AsyncStorage.clear()
+                    setForceUpdate(value => !value)
+                    navigation.navigate('Home')
+                })
+                .catch(error => {
+                    setFlagError(true)
+                    setTextModalError(error.error)
+                    toggleModalTwo()
+                })
+            toggleModal()
+        } else {
+            setFlagError(true)
+            setTextModalError('Tutti i campi devono essere riempiti')
+            toggleModalTwo()
+        }
     }
 
     if (!user) {
@@ -154,9 +207,18 @@ function Settings({ route }) {
 
     return (
         <View style={styles.containerSetting}>
-            {/* Finestra modale */}
+
+            <Modal isVisible={isModalVisibleTwo} onBackdropPress={toggleModalTwo}>
+                <View style={styles.modalContainer}>
+                    {flagError && (
+                        <Text style={styles.titleError}>Errore</Text>
+                    )}
+                    <Text style={[styles.textError, !flagError ? { marginTop: 45 } : null]}>{textModalError}</Text>
+                </View>
+            </Modal>
+
             <Modal isVisible={isModalVisible} onBackdropPress={toggleModal}>
-                <View style={[styles.modalContainer, field === 'password' ? { height: 220 } : { height: 150 }]}>
+                <View style={[styles.modalContainer, field === 'password' ? { height: 220 } : null]}>
                     {field === 'password' && (
                         <TextInput
                             style={styles.commentInput}

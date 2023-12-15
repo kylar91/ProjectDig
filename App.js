@@ -1,9 +1,10 @@
 import { API } from './Config'
 import { useState, useEffect } from 'react'
-import { Alert, TouchableOpacity, Text, StyleSheet } from 'react-native'
+import { Alert, TouchableOpacity, Text, View } from 'react-native'
 import { NavigationContainer, useNavigation } from '@react-navigation/native'
 import { createStackNavigator } from '@react-navigation/stack'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import Modal from 'react-native-modal'
 import Home from './component/home.js'
 import AnimeDetails from './component/dettagliAnime.js'
 import Login from './component/login.js'
@@ -32,7 +33,7 @@ const LogoutButton = (props) => {
   return (
     <TouchableOpacity
       onPress={() => {
-        logout(props.update)
+        logout(props.update, props.toggleModal)
       }}
       style={styles.button}
     >
@@ -43,13 +44,13 @@ const LogoutButton = (props) => {
 
 const LogButton = (props) => {
   if (props.flag) {
-    return <LogoutButton update={props.update} />
+    return <LogoutButton update={props.update} toggleModal={props.toggleModal} />
   } else {
     return <LoginButton />
   }
 }
 
-const logout = async (setForceUpdate) => {
+const logout = async (setForceUpdate, toggleModal) => {
   const storageJSON = await AsyncStorage.getItem('storage')
   const storageData = JSON.parse(storageJSON)
   const token = storageData.token
@@ -73,7 +74,7 @@ const logout = async (setForceUpdate) => {
       AsyncStorage.removeItem('storage')
         .then(() => {
           setForceUpdate(value => !value)
-          Alert.alert('Logout effettuato')
+          toggleModal()
         })
         .catch(error => {
           console.error('Errore durante la cancellazione del token:', error)
@@ -84,9 +85,21 @@ const logout = async (setForceUpdate) => {
     })
 }
 
+const LogoutModal = ({ isModalVisible, toggleModal }) => (
+  <Modal
+    isVisible={isModalVisible}
+    onBackdropPress={toggleModal}
+  >
+    <View style={styles.modalContainer}>
+      <Text style={styles.commentButtonTextModal}>Logout effettuato</Text>
+    </View>
+  </Modal>
+)
+
 export default function App() {
   const [checkLog, setCheckLog] = useState(false)
   const [forceUpdate, setForceUpdate] = useState(false)
+  const [isModalVisible, setIsModalVisible] = useState(false)
 
   useEffect(() => {
     const getToken = async () => {
@@ -100,16 +113,21 @@ export default function App() {
     getToken()
   }, [forceUpdate])
 
+  const toggleModal = () => {
+    setIsModalVisible(!isModalVisible)
+  }
+
   return (
     <NavigationContainer>
+      <LogoutModal isModalVisible={isModalVisible} toggleModal={toggleModal} />
       <Stack.Navigator
         screenOptions={{
           headerStyle: {
-            backgroundColor: '#008000', // Colore di sfondo dell'header
+            backgroundColor: '#008000',
           },
-          headerTintColor: 'white', // Colore del testo dell'header
+          headerTintColor: 'white',
           headerTitleStyle: {
-            fontWeight: 'bold', // Stile del testo del titolo dell'header
+            fontWeight: 'bold',
           },
         }}>
         <Stack.Screen
@@ -117,8 +135,7 @@ export default function App() {
           component={Home}
           options={{
             title: 'Home',
-            headerRight: () => <LogButton flag={checkLog} update={setForceUpdate} />,
-            // headerRightContainerStyle: { marginRight: 15 },
+            headerRight: () => <LogButton flag={checkLog} update={setForceUpdate} toggleModal={toggleModal} />,
           }}
         />
         <Stack.Screen

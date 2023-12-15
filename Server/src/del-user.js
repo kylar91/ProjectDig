@@ -17,14 +17,14 @@ async function delUser(userId, token) {
         let commentsCol = db.collection("Comments")
         const commentsUpdateQuery = {
             $set: { "comments.$[elem].username": 'Utente Rimosso' }
-        };
-        const arrayFilters = [{ "elem.user_id": new ObjectId(userId) }];
+        }
+        const arrayFilters = [{ "elem.user_id": new ObjectId(userId) }]
 
         const updateComments = await commentsCol.updateMany(
             {},
             commentsUpdateQuery,
             { arrayFilters: arrayFilters }
-        );
+        )
 
         result = await logout({ token })
 
