@@ -11,7 +11,6 @@ async function addOnList(animeId, userId, nameList) {
     const checkList = await col.findOne({ "_id": new ObjectId(userId) })
 
     if (checkList) {
-        // Se l'anime è presente in un'altra lista, lo rimuovo da quella lista
         const removeFromOtherLists = ['in_corso', 'completati', 'droppati'].filter(list => list !== nameList)
         const updateFields = removeFromOtherLists.reduce((fields, list) => {
             fields[list] = { _id: new ObjectId(animeId) }
@@ -22,7 +21,6 @@ async function addOnList(animeId, userId, nameList) {
 
         const isAlreadyInList = checkList[nameList].some(item => item._id.toString() === animeId)
 
-        // Se non è già presente, aggiungo l'anime alla lista
         if (!isAlreadyInList) {
             const updateField = {}
             updateField[`${nameList}`] = anime

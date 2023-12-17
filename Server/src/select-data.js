@@ -5,7 +5,7 @@ async function select(nameColl, id) {
   let db = await getDB()
   let col = db.collection(nameColl)
 
-  // Find and return the document
+
   return document = id ? await col.findOne({ "_id": new ObjectId(id) }) :
     await col.find({}).toArray()
 
